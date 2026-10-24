@@ -1,7 +1,5 @@
 # Quản lý bài tập sinh viên (QLBTSV)
 
-Thông tin chi tiết tại [Plan.md](docs/Plan.md)
-
 ## Cấu trúc dự án
 
 ```txt
