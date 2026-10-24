@@ -1,0 +1,81 @@
+## Build output
+bin/
+obj/
+out/
+
+## Visual Studio / Rider
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+## NuGet
+*.nupkg
+*.snupkg
+*.nuget.props
+*.nuget.targets
+packages/
+project.lock.json
+project.assets.json
+project.fragment.lock.json
+
+## MSBuild
+msbuild.log
+msbuild.binlog
+
+## .NET publish output
+publish/
+PublishProfiles/
+*.pubxml
+*.pubxml.user
+
+## Test results
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+coverage*/
+**/coverage.cobertura.xml
+
+## WPF / Windows Designer
+*.aps
+GeneratedFiles/
+_UpgradeReport_Files/
+Backup*/
+UpgradeLog*.xml
+UpgradeLog*.htm
+
+## Runtime / crash dumps
+*.stackdump
+*.dmp
+nativebin/
+
+## Logs
+*.log
+logs/
+
+## OS artifacts
+.DS_Store
+Thumbs.db
+desktop.ini
+
+## Environment / secrets
+.env
+.env.*
+secrets.json
+launchSettings.json
+
+## ReSharper
+_ReSharper*/
+*.DotSettings.user
+
+## Rider
+.idea/
+
+## Temp
+*.tmp
+*.temp
+~$*
