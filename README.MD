@@ -1,6 +1,11 @@
 # Quản lý bài tập sinh viên (QLBTSV)
 
-Thông tin chi tiết tại [Plan.md](docs/Plan.md)
+Quản lý bài tập sinh viên (QLBTSV) là dự án (20%) môn học PRN212
+
+## Mục tiêu dự án
+
+- Tạo ra 1 phần mềm đơn giản để sinh viên, giáo viên, nhà trường để giao, nộp và chấm điểm bài tập cho sinh viên.
+- Giúp người làm nắm rõ về EntityFramework, WPF, và .Net
 
 ## Cấu trúc dự án
 
@@ -25,3 +30,7 @@ Thông tin chi tiết tại [Plan.md](docs/Plan.md)
 ### Chạy dự án
 
 - Chạy multi-startup (`Run all`), đã được cấu hình sẵn trong Visual Studio.
+
+### Khác
+
+Thông tin chi tiết tại [Plan.md](docs/Plan.md)

@@ -1,6 +1,6 @@
 # QLBT
 
-Phần mềm có 2 bản: Server và Client. Giao tiếp qua TCP trong mạng LAN (không mã hóa).
+Phần mềm có 2 bản: Server và Client. Giao tiếp qua TCP trong mạng LAN.
 
 ## Server
 
@@ -144,7 +144,7 @@ Mỗi request 1 kết nối TCP. Khung dữ liệu: `int` độ dài JSON → JS
 - `Forbidden` → đã đăng nhập nhưng không có quyền (sai vai trò, không phải chủ sở hữu, bị đình chỉ)
 - `Rejected` → có quyền nhưng vi phạm quy tắc (bài tập đã đóng, bài nộp đã chấm, kì đã bắt đầu)
 - Logout: client luôn xóa SessionId, kể cả khi server không phản hồi
-- Mật khẩu lưu dạng hash trên server (vd. BCrypt.Net-Next)
+- Mật khẩu lưu dạng hash trên server (BCrypt)
 
 ### Thao tác
 
