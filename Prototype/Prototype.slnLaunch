@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "Run all tcp project",
+    "Projects": [
+      {
+        "Path": "ServerVersion2\\TcpServer\\Server.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "ServerVersion2\\Client\\Client.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
