@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleBcryptDotnet", "ExampleBcryptDotnet\ExampleBcryptDotnet.csproj", "{CD06D637-8825-CF91-794B-F3E0859ECDFE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QLBT.Client", "TransportLayerDemo\QLBT.Client\QLBT.Client.csproj", "{357F5B34-5817-0D64-80B8-97DDDF86F7F9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QLBT.Server", "TransportLayerDemo\QLBT.Server\QLBT.Server.csproj", "{B84FEB85-E226-D1C9-D396-A151B9753DB5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QLBT.Shared", "TransportLayerDemo\QLBT.Shared\QLBT.Shared.csproj", "{227AD140-6D09-FD6C-B4E7-47E0AF64CBFC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QLBT_v2.Shared", "QLBT_v2.Shared\QLBT_v2.Shared.csproj", "{7CA38D64-F9DF-41DA-924C-04AD8461DBA4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CD06D637-8825-CF91-794B-F3E0859ECDFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD06D637-8825-CF91-794B-F3E0859ECDFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD06D637-8825-CF91-794B-F3E0859ECDFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD06D637-8825-CF91-794B-F3E0859ECDFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{357F5B34-5817-0D64-80B8-97DDDF86F7F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{357F5B34-5817-0D64-80B8-97DDDF86F7F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{357F5B34-5817-0D64-80B8-97DDDF86F7F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{357F5B34-5817-0D64-80B8-97DDDF86F7F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B84FEB85-E226-D1C9-D396-A151B9753DB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B84FEB85-E226-D1C9-D396-A151B9753DB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B84FEB85-E226-D1C9-D396-A151B9753DB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B84FEB85-E226-D1C9-D396-A151B9753DB5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{227AD140-6D09-FD6C-B4E7-47E0AF64CBFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{227AD140-6D09-FD6C-B4E7-47E0AF64CBFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{227AD140-6D09-FD6C-B4E7-47E0AF64CBFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{227AD140-6D09-FD6C-B4E7-47E0AF64CBFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7CA38D64-F9DF-41DA-924C-04AD8461DBA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CA38D64-F9DF-41DA-924C-04AD8461DBA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CA38D64-F9DF-41DA-924C-04AD8461DBA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CA38D64-F9DF-41DA-924C-04AD8461DBA4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B5C1C59C-F8EB-4540-B94D-9773066985E1}
+	EndGlobalSection
+EndGlobal
