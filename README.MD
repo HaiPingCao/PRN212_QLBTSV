@@ -25,7 +25,7 @@ Quản lý bài tập sinh viên (QLBTSV) là dự án (20%) môn học PRN212
 ### Yêu cầu dự án
 
 - DotNet SDK 8
-- Visual studio 2022+
+- Visual studio 2022 hoặc cao hơn, cùng với ".NET desktop development"
 
 ### Chạy dự án
 
