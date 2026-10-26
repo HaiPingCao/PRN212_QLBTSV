@@ -26,13 +26,6 @@ dotnet add QLBTSV_re.Server package Microsoft.EntityFrameworkCore.SqlServer --ve
 dotnet add QLBTSV_re.Server package Microsoft.EntityFrameworkCore.Design --version 8.0.28
 ```
 
-## Cài đặt EntityFramework
-
-Liệt kê toàn bộ công cụ DotNet
-`dotnet tool list --global`
-Cài đặt
-`dotnet tool install --global dotnet-ef --version 8.0.6`
-
 ## Tạo Models bằng EF
 
 Sau đó tạo CSDL và Models bằng EF:
@@ -53,18 +46,5 @@ Tạo `appsettings.json` (set `Copy to Output Directory = Always`):
   "ConnectionStrings": {
     "Default": "Server=(local);uid=sa;password=<password>;database=PRN212_P_QLBT;Encrypt=True;TrustServerCertificate=True;"
   }
-}
-```
-
-Thay đổi `OnConfiguring` trong `DBName_Context.cs`
-
-```C#
-protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-{
-    var builder = new ConfigurationBuilder();
-    builder.SetBasePath(Directory.GetCurrentDirectory());
-    builder.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-    var configuration = builder.Build();
-    optionsBuilder.UseSqlServer(configuration.GetConnectionString("Default"));
 }
 ```
