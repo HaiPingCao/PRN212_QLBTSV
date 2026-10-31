@@ -11,5 +11,18 @@
         "Action": "Start"
       }
     ]
+  },
+  {
+    "Name": "Run all Svr3 project",
+    "Projects": [
+      {
+        "Path": "ServerVersion3_ASP\\Svr3.Server\\Svr3.Server.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "ServerVersion3_ASP\\Svr3.Client\\Svr3.Client.csproj",
+        "Action": "Start"
+      }
+    ]
   }
 ]

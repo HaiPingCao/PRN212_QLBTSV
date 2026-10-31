@@ -1,0 +1,64 @@
+<Window x:Class="Svr3.Server.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Svr3 Server" Height="480" Width="760" MinHeight="360" MinWidth="520">
+    <TabControl Margin="8">
+
+        <TabItem Header="Server configuration">
+            <Grid Margin="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Status:" Margin="0,0,12,12" VerticalAlignment="Center" />
+                <TextBlock Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" x:Name="StatusText" Margin="0,0,0,12"
+                           FontWeight="Bold" TextWrapping="Wrap" Text="Stopped" />
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="IP address:" Margin="0,0,12,8" VerticalAlignment="Center" />
+                <ComboBox Grid.Row="1" Grid.Column="1" x:Name="AddressBox" IsEditable="True" Margin="0,0,0,8"
+                          ToolTip="0.0.0.0 = listen on every network interface; 127.0.0.1 = this PC only" />
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Port:" Margin="0,0,12,8" VerticalAlignment="Center" />
+                <TextBox Grid.Row="2" Grid.Column="1" x:Name="PortBox" Width="100" HorizontalAlignment="Left" Margin="0,0,0,8" />
+
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="File save path:" Margin="0,0,12,8" VerticalAlignment="Center" />
+                <TextBox Grid.Row="3" Grid.Column="1" x:Name="StorageBox" Margin="0,0,0,8" />
+                <Button Grid.Row="3" Grid.Column="2" x:Name="BrowseButton" Content="Browse..." Padding="10,2" Margin="8,0,0,8"
+                        Click="Browse_Click" />
+
+                <CheckBox Grid.Row="4" Grid.Column="1" x:Name="AutoStartBox" Margin="0,4,0,8"
+                          Content="Start server when the app opens"
+                          Checked="AutoStart_Changed" Unchecked="AutoStart_Changed" />
+
+                <StackPanel Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,8,0,0">
+                    <Button x:Name="StartButton" Content="Start" Width="90" Margin="0,0,8,0" Click="Start_Click" />
+                    <Button x:Name="StopButton" Content="Stop" Width="90" Margin="0,0,8,0" Click="Stop_Click" />
+                    <Button x:Name="SaveButton" Content="Save" Width="90" Click="Save_Click" />
+                </StackPanel>
+
+                <TextBlock Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,16,0,0" Foreground="Gray" TextWrapping="Wrap"
+                           Text="Stop the server to change the address, port or file path. Stopping logs out every connected client." />
+            </Grid>
+        </TabItem>
+
+        <TabItem Header="Server log">
+            <DockPanel Margin="4">
+                <Button DockPanel.Dock="Top" HorizontalAlignment="Right" Content="Clear" Width="80" Margin="0,0,0,4"
+                        Click="ClearLog_Click" />
+                <ListBox x:Name="LogList" FontFamily="Consolas" />
+            </DockPanel>
+        </TabItem>
+
+    </TabControl>
+</Window>
