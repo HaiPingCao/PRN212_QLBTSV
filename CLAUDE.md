@@ -33,7 +33,7 @@ The main solution is still being scaffolded. Create its projects by following `d
 - Requires the .NET 8 SDK and Visual Studio 2022 with ".NET desktop development" (see `.vsconfig`).
 - Build: `dotnet build QLBTSV_re/QLBTSV_re.sln`, or `dotnet build Prototype/Prototype.sln` for the prototypes.
 - Run: use the multi-startup "Run all" profile in VS, which starts the Server and Client together.
-- Database: `sqlcmd -S "(local)" -i db/QLBT.sql`, then scaffold the EF models into `QLBTSV_re.Server/Models` with `dotnet ef dbcontext scaffold ... --output-dir Models --force` (the full command is in ProjectCreation.md). Don't hand-edit scaffolded entities. Change the schema in `db/QLBT.sql` and re-scaffold.
+- Database: `sqlcmd -S "(local)" -i db/QLBT.sql`, then scaffold the EF models into `QLBTSV_re.Server/Models` with `dotnet ef dbcontext scaffold ... --output-dir Models --no-onconfiguring --force` (the full command and why `--no-onconfiguring` is needed are in ProjectCreation.md). The context gets its connection string from DI (`AddDbContext` in `ServerHost.cs`), never from `OnConfiguring`. Don't hand-edit scaffolded entities. Change the schema in `db/QLBT.sql` and re-scaffold.
 - Test data: `sqlcmd -S "(local)" -E -C -f 65001 -i db/QLBT_test_ds.sql` (run after QLBT.sql, safe to re-run). Every account's password is `123456`. The scenarios are listed in the file header.
 - The connection string goes in `appsettings.json` (Copy to Output Directory = Always). **Never commit real passwords.**
 
