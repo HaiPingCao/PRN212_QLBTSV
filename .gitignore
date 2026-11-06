@@ -79,3 +79,8 @@ _ReSharper*/
 *.tmp
 *.temp
 ~$*
+## Claude Code (personal settings)
+.claude/settings.local.json
+
+## App runtime data
+storage/

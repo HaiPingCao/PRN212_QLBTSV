@@ -1,0 +1,811 @@
+<mxfile host="65bd71144e">
+    <diagram id="1._Files_&amp;_projects" name="1. Files &amp; projects">
+        <mxGraphModel dx="2760" dy="1678" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1420" pageHeight="980" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="c3" parent="1" style="text;html=1;fontSize=20;fontStyle=1;align=left;verticalAlign=middle;" value="QLBT TCP – files and projects" vertex="1">
+                    <mxGeometry height="40" width="800" x="40" y="10" as="geometry"/>
+                </mxCell>
+                <mxCell id="c4" parent="1" style="text;html=1;fontSize=12;align=left;verticalAlign=top;fontColor=#555555;whiteSpace=wrap;" value="Three projects. Client and Server both reference Shared. They only talk over TCP, one request per connection." vertex="1">
+                    <mxGeometry height="25" width="1000" x="40" y="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="c5" parent="1" style="swimlane;html=1;startSize=30;fontSize=14;fontStyle=1;rounded=1;arcSize=4;fillColor=#fff8f0;strokeColor=#d79b00;" value="Client (console exe)" vertex="1">
+                    <mxGeometry height="380" width="380" x="40" y="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="c6" parent="c5" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#ffe6cc;strokeColor=#d79b00;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="&lt;b&gt;Program.cs&lt;/b&gt; &lt;i&gt;test runner&lt;/i&gt;&lt;hr&gt;Main → Run(name, test) → Check()&lt;br&gt;TestEcho · TestEchoFile · TestLogin&lt;br&gt;TestSessionChecks · TestRejectedUpload&lt;br&gt;TestMalformedFrame · TestConcurrency&lt;br&gt;TestUnreachable" vertex="1">
+                    <mxGeometry height="120" width="340" x="20" y="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="c7" parent="c5" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#ffe6cc;strokeColor=#d79b00;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="&lt;b&gt;ServerConnection.cs&lt;/b&gt; &lt;i&gt;client side of protocol&lt;/i&gt;&lt;hr&gt;Login · Logout · Send · Upload · Download&lt;br&gt;→ Exchange(): connect, write request,&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;[write file], read response, [read file]&lt;br&gt;keeps SessionId · raises SessionExpired&lt;br&gt;ReceiveFile(): bytes → .tmp → File.Move" vertex="1">
+                    <mxGeometry height="140" width="340" x="20" y="210" as="geometry"/>
+                </mxCell>
+                <mxCell id="c8" edge="1" parent="1" source="c6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c7" value="calls">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c9" parent="1" style="swimlane;html=1;startSize=30;fontSize=14;fontStyle=1;rounded=1;arcSize=4;fillColor=#f4fbf2;strokeColor=#82b366;" value="Server (console exe)" vertex="1">
+                    <mxGeometry height="610" width="820" x="560" y="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="c10" parent="c9" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="&lt;b&gt;Program.cs&lt;/b&gt; &lt;i&gt;&lt;/i&gt;&lt;hr&gt;new TcpServer(new RequestHandler())&lt;br&gt;Start(config) · wait for Enter · Stop()" vertex="1">
+                    <mxGeometry height="100" width="265" x="20" y="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="c11" parent="c9" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="&lt;b&gt;ServerConfig.cs&lt;/b&gt; &lt;i&gt;&lt;/i&gt;&lt;hr&gt;Port · StoragePath&lt;br&gt;SessionTimeoutMinutes&lt;br&gt;RequestTimeoutSeconds&lt;br&gt;Load · Save · Validate · Clone" vertex="1">
+                    <mxGeometry height="100" width="270" x="300" y="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="c12" parent="c9" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="&lt;b&gt;TcpServer.cs&lt;/b&gt; &lt;i&gt;&lt;/i&gt;&lt;hr&gt;Start(config) · Stop()&lt;br&gt;AcceptLoop → HandleConnection&lt;br&gt;&amp;nbsp;&amp;nbsp;→ Wire.ReadRequest&lt;br&gt;&amp;nbsp;&amp;nbsp;→ Dispatch → handler.Handle(ctx)&lt;br&gt;drains unread upload bytes&lt;br&gt;owns Sessions (SessionsManager)&lt;br&gt;LogMessage event" vertex="1">
+                    <mxGeometry height="150" width="265" x="20" y="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="c13" parent="c9" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="&lt;b&gt;IRequestHandler.cs&lt;/b&gt; &lt;i&gt;interface&lt;/i&gt;&lt;hr&gt;Task Handle(RequestContext)" vertex="1">
+                    <mxGeometry height="60" width="240" x="330" y="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="c14" parent="c9" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="&lt;b&gt;RequestHandler.cs&lt;/b&gt; &lt;i&gt;the switch&lt;/i&gt;&lt;hr&gt;switch (ctx.Request.Type)&lt;br&gt;Login · Logout · role groups&lt;br&gt;NotImplemented · Echo · EchoFile" vertex="1">
+                    <mxGeometry height="90" width="240" x="330" y="290" as="geometry"/>
+                </mxCell>
+                <mxCell id="c15" parent="c9" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="&lt;b&gt;RequestContext.cs&lt;/b&gt; &lt;i&gt;one per request&lt;/i&gt;&lt;hr&gt;Request · Session · Sessions · Storage&lt;br&gt;RequireRole(roles) → Unauthorized / Forbidden&lt;br&gt;Ok · Fail · Send (exactly one reply)&lt;br&gt;ReceiveFile (.tmp → move) · SendFile" vertex="1">
+                    <mxGeometry height="120" width="300" x="20" y="420" as="geometry"/>
+                </mxCell>
+                <mxCell id="c16" parent="c9" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="&lt;b&gt;SessionsManager.cs&lt;/b&gt; &lt;i&gt;&lt;/i&gt;&lt;hr&gt;Dictionary + lock&lt;br&gt;Create · Get · Remove&lt;br&gt;expires after idle timeout" vertex="1">
+                    <mxGeometry height="100" width="200" x="600" y="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="c17" parent="c9" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="&lt;b&gt;Models/Session.cs&lt;/b&gt; &lt;i&gt;&lt;/i&gt;&lt;hr&gt;Id · UserId · Role&lt;br&gt;LastSeenUtc" vertex="1">
+                    <mxGeometry height="76" width="200" x="600" y="320" as="geometry"/>
+                </mxCell>
+                <mxCell id="c18" parent="c9" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="&lt;b&gt;FileStorageManager.cs&lt;/b&gt; &lt;i&gt;&lt;/i&gt;&lt;hr&gt;file paths from IDs:&lt;br&gt;{root}/{sem}/{class}/{asg}/&lt;br&gt;&amp;nbsp;&amp;nbsp;assignment&lt;br&gt;&amp;nbsp;&amp;nbsp;submissions/{id}" vertex="1">
+                    <mxGeometry height="110" width="200" x="600" y="430" as="geometry"/>
+                </mxCell>
+                <mxCell id="c19" edge="1" parent="1" source="c10" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="c12" value="creates, Start / Stop">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c20" edge="1" parent="1" source="c10" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="c11" value="builds">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c21" edge="1" parent="1" source="c14" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;dashed=1;endArrow=block;endFill=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="c13" value="implements">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c22" edge="1" parent="1" source="c12" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;exitX=1;exitY=0.2;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="c13" value="calls Handle">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c23" edge="1" parent="1" source="c12" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.4417;entryY=0;entryDx=0;entryDy=0;" target="c15" value="creates per request">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c24" edge="1" parent="1" source="c14" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.3;entryDx=0;entryDy=0;" target="c15" value="uses ctx">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c25" edge="1" parent="1" source="c15" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;exitX=1;exitY=0.15;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="c16" value="RequireRole → Get">
+                    <mxGeometry relative="1" x="-0.55" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1145" y="528"/>
+                            <mxPoint x="1145" y="320"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c26" edge="1" parent="1" source="c15" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.7273;entryDx=0;entryDy=0;" target="c18" value="Storage">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c27" edge="1" parent="1" source="c16" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="c17" value="stores">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c28" edge="1" parent="1" source="c7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;strokeWidth=3;dashed=1;strokeColor=#666666;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.6667;entryDx=0;entryDy=0;" target="c12" value="&lt;b&gt;TCP :5000&lt;/b&gt;&lt;br&gt;1 request per connection">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c29" parent="1" style="swimlane;html=1;startSize=30;fontSize=14;fontStyle=1;rounded=1;arcSize=4;fillColor=#f3f7fd;strokeColor=#6c8ebf;" value="Shared (class library)" vertex="1">
+                    <mxGeometry height="200" width="1340" x="40" y="740" as="geometry"/>
+                </mxCell>
+                <mxCell id="c30" parent="c29" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="&lt;b&gt;MessageType.cs&lt;/b&gt; &lt;i&gt;enum&lt;/i&gt;&lt;hr&gt;16 operations&lt;br&gt;+ Echo, EchoFile (test)" vertex="1">
+                    <mxGeometry height="140" width="180" x="20" y="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="c31" parent="c29" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="&lt;b&gt;ResponseStatus.cs&lt;/b&gt; &lt;i&gt;enum&lt;/i&gt;&lt;hr&gt;Ok · InvalidCredentials&lt;br&gt;Unauthorized&lt;br&gt;Forbidden · NotFound&lt;br&gt;Rejected · Error" vertex="1">
+                    <mxGeometry height="140" width="180" x="208" y="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="c32" parent="c29" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="&lt;b&gt;UserRole.cs&lt;/b&gt; &lt;i&gt;enum&lt;/i&gt;&lt;hr&gt;Teacher = 1&lt;br&gt;Student = 2" vertex="1">
+                    <mxGeometry height="140" width="180" x="396" y="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="c33" parent="c29" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="&lt;b&gt;Request.cs&lt;/b&gt; &lt;i&gt;&lt;/i&gt;&lt;hr&gt;Type · SessionId&lt;br&gt;Body · FileLength&lt;br&gt;Create · GetBody&amp;lt;T&amp;gt;" vertex="1">
+                    <mxGeometry height="140" width="180" x="584" y="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="c34" parent="c29" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="&lt;b&gt;Response.cs&lt;/b&gt; &lt;i&gt;&lt;/i&gt;&lt;hr&gt;Type · Status · Error&lt;br&gt;SessionId · Body&lt;br&gt;FileLength&lt;br&gt;Ok · Fail · GetBody&amp;lt;T&amp;gt;" vertex="1">
+                    <mxGeometry height="140" width="180" x="772" y="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="c35" parent="c29" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="&lt;b&gt;BodyReader.cs&lt;/b&gt; &lt;i&gt;internal&lt;/i&gt;&lt;hr&gt;JSON body → T&lt;br&gt;bad body →&lt;br&gt;InvalidDataException" vertex="1">
+                    <mxGeometry height="140" width="180" x="960" y="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="c36" parent="c29" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="&lt;b&gt;Wire.cs&lt;/b&gt; &lt;i&gt;framing&lt;/i&gt;&lt;hr&gt;WriteRequest&lt;br&gt;ReadRequest&lt;br&gt;WriteResponse&lt;br&gt;ReadResponse&lt;br&gt;WriteFile · ReadFile" vertex="1">
+                    <mxGeometry height="140" width="180" x="1148" y="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="c37" edge="1" parent="1" source="c5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;dashed=1;exitX=0.95;exitY=1;exitDx=0;exitDy=0;entryX=0.2694;entryY=0;entryDx=0;entryDy=0;" target="c29" value="references">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c38" edge="1" parent="1" source="c9" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.694;entryY=0;entryDx=0;entryDy=0;" target="c29" value="references">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c39" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=0;fillColor=#f5f5f5;strokeColor=#999999;fontColor=#333333;align=left;spacingLeft=8;" value="&lt;b&gt;Legend&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;background:#ffe6cc&quot;&gt;&amp;nbsp;orange&amp;nbsp;&lt;/span&gt; client &amp;nbsp; &lt;span style=&quot;background:#d5e8d4&quot;&gt;&amp;nbsp;green&amp;nbsp;&lt;/span&gt; server &amp;nbsp; &lt;span style=&quot;background:#dae8fc&quot;&gt;&amp;nbsp;blue&amp;nbsp;&lt;/span&gt; shared&lt;br&gt;solid arrow = calls / creates&lt;br&gt;dashed arrow, hollow head = implements&lt;br&gt;thick dashed = network" vertex="1">
+                    <mxGeometry height="110" width="330" x="40" y="510" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="2._Request_flow" name="2. Request flow">
+        <mxGraphModel dx="920" dy="559" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1500" pageHeight="1471" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="c33" edge="1" parent="1" style="endArrow=none;dashed=1;strokeColor=#999999;html=1;" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="130" y="134" as="sourcePoint"/>
+                        <mxPoint x="130" y="1431" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c34" edge="1" parent="1" style="endArrow=none;dashed=1;strokeColor=#999999;html=1;" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="360" y="134" as="sourcePoint"/>
+                        <mxPoint x="360" y="1431" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c35" edge="1" parent="1" style="endArrow=none;dashed=1;strokeColor=#999999;html=1;" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="690" y="134" as="sourcePoint"/>
+                        <mxPoint x="690" y="1431" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c36" edge="1" parent="1" style="endArrow=none;dashed=1;strokeColor=#999999;html=1;" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="920" y="134" as="sourcePoint"/>
+                        <mxPoint x="920" y="1431" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c37" edge="1" parent="1" style="endArrow=none;dashed=1;strokeColor=#999999;html=1;" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="1150" y="134" as="sourcePoint"/>
+                        <mxPoint x="1150" y="1431" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c38" edge="1" parent="1" style="endArrow=none;dashed=1;strokeColor=#999999;html=1;" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="1380" y="134" as="sourcePoint"/>
+                        <mxPoint x="1380" y="1431" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c39" edge="1" parent="1" style="endArrow=none;strokeWidth=4;strokeColor=#cccccc;html=1;" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="540" y="120" as="sourcePoint"/>
+                        <mxPoint x="540" y="1431" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c3" parent="1" style="text;html=1;fontSize=20;fontStyle=1;align=left;verticalAlign=middle;" value="One request, step by step – example: Send(GetProfile)" vertex="1">
+                    <mxGeometry height="40" width="1000" x="40" y="10" as="geometry"/>
+                </mxCell>
+                <mxCell id="c4" parent="1" style="text;html=1;fontSize=12;align=left;verticalAlign=top;fontColor=#555555;whiteSpace=wrap;" value="Arrows are function calls (solid) or returns (dashed). Grey boxes are what happens inside that object." vertex="1">
+                    <mxGeometry height="25" width="1000" x="40" y="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="c5" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="&lt;b&gt;Client Program.cs&lt;/b&gt;" vertex="1">
+                    <mxGeometry height="44" width="190" x="35" y="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="c6" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="&lt;b&gt;ServerConnection&lt;/b&gt;" vertex="1">
+                    <mxGeometry height="44" width="190" x="265" y="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="c7" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;b&gt;TcpServer&lt;/b&gt;" vertex="1">
+                    <mxGeometry height="44" width="190" x="595" y="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="c8" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;b&gt;RequestHandler&lt;/b&gt;" vertex="1">
+                    <mxGeometry height="44" width="190" x="825" y="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="c9" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;b&gt;RequestContext&lt;/b&gt;" vertex="1">
+                    <mxGeometry height="44" width="190" x="1055" y="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="c10" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;b&gt;SessionsManager&lt;/b&gt;" vertex="1">
+                    <mxGeometry height="44" width="190" x="1285" y="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="c11" parent="1" style="text;html=1;fontSize=11;fontColor=#666666;align=center;" value="network" vertex="1">
+                    <mxGeometry height="30" width="70" x="505" y="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="c12" edge="1" parent="1" style="html=1;fontSize=10;endArrow=block;endFill=1;verticalAlign=bottom;" value="1. Send(MessageType.GetProfile)">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="130" y="165" as="sourcePoint"/>
+                        <mxPoint x="360" y="165" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c13" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=0;fillColor=#f5f5f5;strokeColor=#999999;fontColor=#333333;fontSize=10;" value="2. Request.Create(type, SessionId)&lt;br&gt;Exchange(): TcpClient.ConnectAsync&lt;br&gt;(connect timeout 5 s)" vertex="1">
+                    <mxGeometry height="52" width="250" x="235" y="213" as="geometry"/>
+                </mxCell>
+                <mxCell id="c14" edge="1" parent="1" style="html=1;fontSize=10;endArrow=block;endFill=1;verticalAlign=bottom;" value="3. TCP connect">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="360" y="281" as="sourcePoint"/>
+                        <mxPoint x="690" y="281" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c15" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=0;fillColor=#f5f5f5;strokeColor=#999999;fontColor=#333333;fontSize=10;" value="4. AcceptLoop: AcceptTcpClientAsync&lt;br&gt;_ = HandleConnection(client)&lt;br&gt;(own task per connection)" vertex="1">
+                    <mxGeometry height="52" width="250" x="565" y="329" as="geometry"/>
+                </mxCell>
+                <mxCell id="c16" edge="1" parent="1" style="html=1;fontSize=10;endArrow=block;endFill=1;verticalAlign=bottom;" value="5. Wire.WriteRequest: [int32 length][JSON]">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="360" y="397" as="sourcePoint"/>
+                        <mxPoint x="690" y="397" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c17" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=0;fillColor=#f5f5f5;strokeColor=#999999;fontColor=#333333;fontSize=10;" value="6. Wire.ReadRequest&lt;br&gt;(gives up after RequestTimeoutSeconds)&lt;br&gt;Dispatch: new RequestContext(...)" vertex="1">
+                    <mxGeometry height="52" width="250" x="565" y="445" as="geometry"/>
+                </mxCell>
+                <mxCell id="c18" edge="1" parent="1" style="html=1;fontSize=10;endArrow=block;endFill=1;verticalAlign=bottom;" value="7. handler.Handle(ctx)">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="690" y="513" as="sourcePoint"/>
+                        <mxPoint x="920" y="513" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c19" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=0;fillColor=#f5f5f5;strokeColor=#999999;fontColor=#333333;fontSize=10;" value="8. switch (ctx.Request.Type)&lt;br&gt;case GetProfile:" vertex="1">
+                    <mxGeometry height="40" width="250" x="795" y="561" as="geometry"/>
+                </mxCell>
+                <mxCell id="c20" edge="1" parent="1" style="html=1;fontSize=10;endArrow=block;endFill=1;verticalAlign=bottom;" value="9. await ctx.RequireRole(Teacher, Student)">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="920" y="617" as="sourcePoint"/>
+                        <mxPoint x="1150" y="617" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c21" edge="1" parent="1" style="html=1;fontSize=10;endArrow=block;endFill=1;verticalAlign=bottom;" value="10. Sessions.Get(SessionId)">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="1150" y="665" as="sourcePoint"/>
+                        <mxPoint x="1380" y="665" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c22" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=0;fillColor=#f5f5f5;strokeColor=#999999;fontColor=#333333;fontSize=10;" value="11. lock (sync):&lt;br&gt;not found → null&lt;br&gt;expired → remove, null&lt;br&gt;else refresh LastSeenUtc" vertex="1">
+                    <mxGeometry height="70" width="200" x="1280" y="713" as="geometry"/>
+                </mxCell>
+                <mxCell id="c23" edge="1" parent="1" style="html=1;fontSize=10;endArrow=block;endFill=1;verticalAlign=bottom;dashed=1;endArrow=open;" value="12. Session or null">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="1380" y="799" as="sourcePoint"/>
+                        <mxPoint x="1150" y="799" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c24" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;spacingLeft=6;fontSize=10;" value="&lt;b&gt;13.&lt;/b&gt; null → Fail(Unauthorized), return false&lt;br&gt;wrong role → Fail(Forbidden), return false&lt;br&gt;ok → ctx.Session = session, return true" vertex="1">
+                    <mxGeometry height="60" width="310" x="995" y="847" as="geometry"/>
+                </mxCell>
+                <mxCell id="c25" edge="1" parent="1" style="html=1;fontSize=10;endArrow=block;endFill=1;verticalAlign=bottom;dashed=1;endArrow=open;" value="14. true / false">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="1150" y="923" as="sourcePoint"/>
+                        <mxPoint x="920" y="923" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c26" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=0;fillColor=#f5f5f5;strokeColor=#999999;fontColor=#333333;fontSize=10;" value="15. false → break (reply already sent)&lt;br&gt;true → run the case" vertex="1">
+                    <mxGeometry height="44" width="250" x="795" y="971" as="geometry"/>
+                </mxCell>
+                <mxCell id="c27" edge="1" parent="1" style="html=1;fontSize=10;endArrow=block;endFill=1;verticalAlign=bottom;" value="16. ctx.Ok(body) or ctx.Fail(status, error)">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="920" y="1031" as="sourcePoint"/>
+                        <mxPoint x="1150" y="1031" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c28" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=0;fillColor=#f5f5f5;strokeColor=#999999;fontColor=#333333;fontSize=10;" value="17. Send(): one reply only,&lt;br&gt;Type must match the request&lt;br&gt;→ Wire.WriteResponse" vertex="1">
+                    <mxGeometry height="52" width="250" x="1025" y="1079" as="geometry"/>
+                </mxCell>
+                <mxCell id="c29" edge="1" parent="1" style="html=1;fontSize=10;endArrow=block;endFill=1;verticalAlign=bottom;dashed=1;endArrow=open;" value="18. [int32 length][Response JSON] over the network">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="1150" y="1147" as="sourcePoint"/>
+                        <mxPoint x="360" y="1147" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c30" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=0;fillColor=#f5f5f5;strokeColor=#999999;fontColor=#333333;fontSize=10;" value="19. back in Dispatch:&lt;br&gt;no reply sent → Fail(Error)&lt;br&gt;exception → Fail(Error), log details&lt;br&gt;log one line · drain unread upload&lt;br&gt;close connection" vertex="1">
+                    <mxGeometry height="84" width="250" x="565" y="1195" as="geometry"/>
+                </mxCell>
+                <mxCell id="c31" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=0;fillColor=#f5f5f5;strokeColor=#999999;fontColor=#333333;fontSize=10;" value="20. Wire.ReadResponse&lt;br&gt;Unauthorized → SessionId = null,&lt;br&gt;raise SessionExpired" vertex="1">
+                    <mxGeometry height="52" width="230" x="245" y="1295" as="geometry"/>
+                </mxCell>
+                <mxCell id="c32" edge="1" parent="1" style="html=1;fontSize=10;endArrow=block;endFill=1;verticalAlign=bottom;dashed=1;endArrow=open;" value="21. return Response → check Status">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="360" y="1363" as="sourcePoint"/>
+                        <mxPoint x="130" y="1363" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="3._Server_logic" name="3. Server logic">
+        <mxGraphModel dx="920" dy="559" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="1660" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="c3" parent="1" style="text;html=1;fontSize=20;fontStyle=1;align=left;verticalAlign=middle;" value="What the server does with one connection" vertex="1">
+                    <mxGeometry height="40" width="900" x="40" y="10" as="geometry"/>
+                </mxCell>
+                <mxCell id="c4" parent="1" style="text;html=1;fontSize=12;align=left;verticalAlign=top;fontColor=#555555;whiteSpace=wrap;" value="TcpServer.HandleConnection → Dispatch → RequestHandler.Handle. Red boxes send an error reply." vertex="1">
+                    <mxGeometry height="25" width="1000" x="40" y="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="c5" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;arcSize=50;fillColor=#e1d5e7;strokeColor=#9673a6;" value="Client connects&lt;br&gt;AcceptLoop → HandleConnection" vertex="1">
+                    <mxGeometry height="56" width="260" x="290" y="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="c6" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Wire.ReadRequest&lt;br&gt;(timeout: RequestTimeoutSeconds)" vertex="1">
+                    <mxGeometry height="56" width="260" x="290" y="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="c7" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rhombus;fillColor=#fff2cc;strokeColor=#d6b656;" value="readable?" vertex="1">
+                    <mxGeometry height="90" width="200" x="320" y="270" as="geometry"/>
+                </mxCell>
+                <mxCell id="c8" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#f8cecc;strokeColor=#b85450;" value="log &quot;unreadable request&quot;&lt;br&gt;close – no reply possible&lt;br&gt;(type unknown)" vertex="1">
+                    <mxGeometry height="60" width="260" x="720" y="285" as="geometry"/>
+                </mxCell>
+                <mxCell id="c9" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Dispatch:&lt;br&gt;new RequestContext · handler.Handle(ctx)" vertex="1">
+                    <mxGeometry height="56" width="260" x="290" y="395" as="geometry"/>
+                </mxCell>
+                <mxCell id="c10" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rhombus;fillColor=#fff2cc;strokeColor=#d6b656;" value="switch&lt;br&gt;(Request.Type)" vertex="1">
+                    <mxGeometry height="100" width="220" x="310" y="485" as="geometry"/>
+                </mxCell>
+                <mxCell id="c11" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;b&gt;Login · Echo · EchoFile&lt;/b&gt;&lt;br&gt;no session needed" vertex="1">
+                    <mxGeometry height="60" width="240" x="20" y="505" as="geometry"/>
+                </mxCell>
+                <mxCell id="c12" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#f8cecc;strokeColor=#b85450;" value="default:&lt;br&gt;Fail(Error, &quot;Operation not supported.&quot;)" vertex="1">
+                    <mxGeometry height="60" width="260" x="720" y="505" as="geometry"/>
+                </mxCell>
+                <mxCell id="c13" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="other operations:&lt;br&gt;await ctx.RequireRole(roles)" vertex="1">
+                    <mxGeometry height="56" width="260" x="290" y="620" as="geometry"/>
+                </mxCell>
+                <mxCell id="c14" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rhombus;fillColor=#fff2cc;strokeColor=#d6b656;" value="session valid?&lt;br&gt;(SessionsManager.Get)" vertex="1">
+                    <mxGeometry height="100" width="250" x="295" y="705" as="geometry"/>
+                </mxCell>
+                <mxCell id="c15" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#f8cecc;strokeColor=#b85450;" value="Fail(Unauthorized)&lt;br&gt;return false" vertex="1">
+                    <mxGeometry height="60" width="260" x="720" y="725" as="geometry"/>
+                </mxCell>
+                <mxCell id="c16" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rhombus;fillColor=#fff2cc;strokeColor=#d6b656;" value="role allowed?" vertex="1">
+                    <mxGeometry height="90" width="200" x="320" y="835" as="geometry"/>
+                </mxCell>
+                <mxCell id="c17" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#f8cecc;strokeColor=#b85450;" value="Fail(Forbidden)&lt;br&gt;return false" vertex="1">
+                    <mxGeometry height="60" width="260" x="720" y="850" as="geometry"/>
+                </mxCell>
+                <mxCell id="c18" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;b&gt;run the case&lt;/b&gt;&lt;br&gt;NotImplemented · Logout · Echo ...&lt;br&gt;ctx.Ok · Fail · ReceiveFile · SendFile" vertex="1">
+                    <mxGeometry height="70" width="260" x="290" y="960" as="geometry"/>
+                </mxCell>
+                <mxCell id="c19" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rhombus;fillColor=#fff2cc;strokeColor=#d6b656;" value="exception?" vertex="1">
+                    <mxGeometry height="90" width="200" x="320" y="1065" as="geometry"/>
+                </mxCell>
+                <mxCell id="c20" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#f8cecc;strokeColor=#b85450;" value="InvalidDataException →&lt;br&gt;Fail(Error, &quot;Invalid request: ...&quot;)" vertex="1">
+                    <mxGeometry height="50" width="260" x="20" y="1060" as="geometry"/>
+                </mxCell>
+                <mxCell id="c21" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#f8cecc;strokeColor=#b85450;" value="other exception → log details,&lt;br&gt;Fail(Error, &quot;Server error.&quot;)" vertex="1">
+                    <mxGeometry height="50" width="260" x="20" y="1125" as="geometry"/>
+                </mxCell>
+                <mxCell id="c22" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rhombus;fillColor=#fff2cc;strokeColor=#d6b656;" value="reply sent?" vertex="1">
+                    <mxGeometry height="90" width="200" x="320" y="1190" as="geometry"/>
+                </mxCell>
+                <mxCell id="c23" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#f8cecc;strokeColor=#b85450;" value="Fail(Error, &quot;Server error.&quot;)&lt;br&gt;(handler forgot to reply)" vertex="1">
+                    <mxGeometry height="60" width="260" x="720" y="1205" as="geometry"/>
+                </mxCell>
+                <mxCell id="c24" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="log one line:&lt;br&gt;remote · Type -&gt; Status (user)" vertex="1">
+                    <mxGeometry height="56" width="260" x="290" y="1315" as="geometry"/>
+                </mxCell>
+                <mxCell id="c25" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rhombus;fillColor=#fff2cc;strokeColor=#d6b656;" value="FileLength set and&lt;br&gt;upload not read?" vertex="1">
+                    <mxGeometry height="100" width="220" x="310" y="1405" as="geometry"/>
+                </mxCell>
+                <mxCell id="c26" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Wire.ReadFile → Stream.Null&lt;br&gt;(drain, so the client still&lt;br&gt;receives the reply)" vertex="1">
+                    <mxGeometry height="60" width="260" x="720" y="1425" as="geometry"/>
+                </mxCell>
+                <mxCell id="c27" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;arcSize=50;fillColor=#e1d5e7;strokeColor=#9673a6;" value="close connection" vertex="1">
+                    <mxGeometry height="50" width="260" x="290" y="1545" as="geometry"/>
+                </mxCell>
+                <mxCell id="c28" edge="1" parent="1" source="c5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c6" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c29" edge="1" parent="1" source="c6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c7" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c30" edge="1" parent="1" source="c7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c8" value="no">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c31" edge="1" parent="1" source="c7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c9" value="yes">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c32" edge="1" parent="1" source="c9" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c10" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c33" edge="1" parent="1" source="c10" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c11" value="Login / Echo /&lt;br&gt;EchoFile">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c34" edge="1" parent="1" source="c10" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c12" value="unknown">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c35" edge="1" parent="1" source="c10" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c13" value="others">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c36" edge="1" parent="1" source="c11" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="c18" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="140" y="995"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c37" edge="1" parent="1" source="c13" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c14" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c38" edge="1" parent="1" source="c14" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c15" value="no">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c39" edge="1" parent="1" source="c14" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c16" value="yes">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c40" edge="1" parent="1" source="c16" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c17" value="no">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c41" edge="1" parent="1" source="c16" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c18" value="yes">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c42" edge="1" parent="1" source="c18" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c19" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c43" edge="1" parent="1" source="c12" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="c19" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1020" y="535"/>
+                            <mxPoint x="1020" y="1110"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c44" edge="1" parent="1" source="c15" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="c19" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1020" y="755"/>
+                            <mxPoint x="1020" y="1110"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c45" edge="1" parent="1" source="c17" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="c19" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1020" y="880"/>
+                            <mxPoint x="1020" y="1110"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c46" edge="1" parent="1" source="c19" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="c20" value="yes">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c47" edge="1" parent="1" source="c19" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="c21" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c48" edge="1" parent="1" source="c19" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c22" value="no">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c49" edge="1" parent="1" source="c22" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c23" value="no">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c50" edge="1" parent="1" source="c22" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c24" value="yes">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c51" edge="1" parent="1" source="c20" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.6;entryDx=0;entryDy=0;" target="c24" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="10" y="1085"/>
+                            <mxPoint x="10" y="1349"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c52" edge="1" parent="1" source="c21" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.3;entryDx=0;entryDy=0;" target="c24" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="150" y="1332"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c53" edge="1" parent="1" source="c23" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="c24" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="850" y="1343"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c54" edge="1" parent="1" source="c24" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c25" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c55" edge="1" parent="1" source="c25" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c26" value="yes">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c56" edge="1" parent="1" source="c25" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c27" value="no">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c57" edge="1" parent="1" source="c26" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="c27" value="">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="850" y="1570"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c58" parent="1" style="text;html=1;fontSize=10;fontColor=#b85450;align=center;" value="handler returns&lt;br&gt;(reply already sent)" vertex="1">
+                    <mxGeometry height="40" width="140" x="1030" y="960" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="4._Wire_format_&amp;_files" name="4. Wire format &amp; files">
+        <mxGraphModel dx="920" dy="559" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1180" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="c3" parent="1" style="text;html=1;fontSize=20;fontStyle=1;align=left;verticalAlign=middle;" value="What travels on the wire" vertex="1">
+                    <mxGeometry height="40" width="900" x="40" y="10" as="geometry"/>
+                </mxCell>
+                <mxCell id="c4" parent="1" style="text;html=1;fontSize=12;align=left;verticalAlign=top;fontColor=#555555;whiteSpace=wrap;" value="Every message: a 4-byte length, the JSON, then file bytes only if FileLength is set." vertex="1">
+                    <mxGeometry height="25" width="1000" x="40" y="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="c5" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;b&gt;int32 length&lt;/b&gt;&lt;br&gt;4 bytes, little-endian" vertex="1">
+                    <mxGeometry height="60" width="200" x="40" y="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="c6" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;b&gt;UTF-8 JSON&lt;/b&gt; of Request or Response&lt;br&gt;max 1 MB (Wire.MaxMessageBytes)" vertex="1">
+                    <mxGeometry height="60" width="420" x="240" y="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="c7" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=1;" value="&lt;b&gt;file bytes&lt;/b&gt; (optional)&lt;br&gt;exactly FileLength bytes, no size limit" vertex="1">
+                    <mxGeometry height="60" width="380" x="660" y="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="c8" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="&lt;b&gt;Request JSON&lt;/b&gt; &lt;i&gt;client → server&lt;/i&gt;&lt;hr&gt;Type: &quot;SubmitAssignment&quot; (enum as name)&lt;br&gt;SessionId: null before login&lt;br&gt;Body: { ... } operation data, or null&lt;br&gt;FileLength: bytes that follow, or null" vertex="1">
+                    <mxGeometry height="100" width="480" x="40" y="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="c9" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="&lt;b&gt;Response JSON&lt;/b&gt; &lt;i&gt;server → client&lt;/i&gt;&lt;hr&gt;Type: same as the request&lt;br&gt;Status: Ok · Unauthorized · Forbidden · Rejected ...&lt;br&gt;Error: message when Status is not Ok&lt;br&gt;SessionId: only set by a successful Login&lt;br&gt;Body · FileLength: same meaning as in Request" vertex="1">
+                    <mxGeometry height="115" width="480" x="560" y="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="c10" parent="1" style="text;html=1;fontSize=14;align=left;" value="&lt;b&gt;Upload&lt;/b&gt; (e.g. SubmitAssignment)" vertex="1">
+                    <mxGeometry height="30" width="480" x="40" y="330" as="geometry"/>
+                </mxCell>
+                <mxCell id="c11" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="ServerConnection.Upload(type, body, filePath)&lt;br&gt;request.FileLength = file.Length" vertex="1">
+                    <mxGeometry height="50" width="480" x="40" y="370" as="geometry"/>
+                </mxCell>
+                <mxCell id="c12" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="Wire.WriteRequest → Wire.WriteFile (exact bytes)" vertex="1">
+                    <mxGeometry height="40" width="480" x="40" y="450" as="geometry"/>
+                </mxCell>
+                <mxCell id="c13" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="TcpServer: ReadRequest → handler.Handle(ctx)&lt;br&gt;RequireRole + business rules" vertex="1">
+                    <mxGeometry height="50" width="480" x="40" y="520" as="geometry"/>
+                </mxCell>
+                <mxCell id="c14" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rhombus;fillColor=#fff2cc;strokeColor=#d6b656;" value="allowed?" vertex="1">
+                    <mxGeometry height="80" width="200" x="180" y="600" as="geometry"/>
+                </mxCell>
+                <mxCell id="c15" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="ctx.ReceiveFile(finalPath)&lt;br&gt;bytes → finalPath.tmp" vertex="1">
+                    <mxGeometry height="50" width="300" x="40" y="715" as="geometry"/>
+                </mxCell>
+                <mxCell id="c16" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#f8cecc;strokeColor=#b85450;" value="ctx.Fail(Rejected / Forbidden / ...)&lt;br&gt;file NOT read by handler →&lt;br&gt;TcpServer drains the bytes" vertex="1">
+                    <mxGeometry height="70" width="260" x="360" y="705" as="geometry"/>
+                </mxCell>
+                <mxCell id="c17" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rhombus;fillColor=#fff2cc;strokeColor=#d6b656;" value="all bytes&lt;br&gt;arrived?" vertex="1">
+                    <mxGeometry height="80" width="200" x="90" y="800" as="geometry"/>
+                </mxCell>
+                <mxCell id="c18" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="File.Move(tmp, finalPath, overwrite)&lt;br&gt;ctx.Ok(result)" vertex="1">
+                    <mxGeometry height="50" width="300" x="40" y="915" as="geometry"/>
+                </mxCell>
+                <mxCell id="c19" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#f8cecc;strokeColor=#b85450;" value="client disconnected:&lt;br&gt;delete .tmp, old file kept" vertex="1">
+                    <mxGeometry height="50" width="260" x="360" y="815" as="geometry"/>
+                </mxCell>
+                <mxCell id="c20" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="Wire.ReadResponse → check Status" vertex="1">
+                    <mxGeometry height="40" width="580" x="40" y="1005" as="geometry"/>
+                </mxCell>
+                <mxCell id="c21" edge="1" parent="1" source="c11" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c12" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c22" edge="1" parent="1" source="c12" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c13" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c23" edge="1" parent="1" source="c13" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c14" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c24" edge="1" parent="1" source="c14" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="c15" value="yes">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="190" y="640"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c25" edge="1" parent="1" source="c14" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="c16" value="no">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="490" y="640"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c26" edge="1" parent="1" source="c15" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c17" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c27" edge="1" parent="1" source="c17" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c18" value="yes">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c28" edge="1" parent="1" source="c17" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c19" value="no">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c29" edge="1" parent="1" source="c18" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c20" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c30" edge="1" parent="1" source="c16" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="c20" value="reply">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="650" y="740"/>
+                            <mxPoint x="650" y="1025"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c31" parent="1" style="text;html=1;fontSize=14;align=left;" value="&lt;b&gt;Download&lt;/b&gt; (e.g. DownloadSubmission)" vertex="1">
+                    <mxGeometry height="30" width="480" x="760" y="330" as="geometry"/>
+                </mxCell>
+                <mxCell id="c32" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="ServerConnection.Download(type, body, savePath)" vertex="1">
+                    <mxGeometry height="40" width="480" x="760" y="370" as="geometry"/>
+                </mxCell>
+                <mxCell id="c33" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="handler: RequireRole + checks →&lt;br&gt;ctx.SendFile(path, body)" vertex="1">
+                    <mxGeometry height="50" width="480" x="760" y="450" as="geometry"/>
+                </mxCell>
+                <mxCell id="c34" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rhombus;fillColor=#fff2cc;strokeColor=#d6b656;" value="file exists?" vertex="1">
+                    <mxGeometry height="80" width="200" x="900" y="530" as="geometry"/>
+                </mxCell>
+                <mxCell id="c35" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Response.FileLength = file size&lt;br&gt;Wire.WriteResponse → Wire.WriteFile" vertex="1">
+                    <mxGeometry height="50" width="330" x="760" y="645" as="geometry"/>
+                </mxCell>
+                <mxCell id="c36" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#f8cecc;strokeColor=#b85450;" value="FileNotFoundException →&lt;br&gt;Fail(Error, &quot;Server error.&quot;), no file" vertex="1">
+                    <mxGeometry height="60" width="260" x="1110" y="640" as="geometry"/>
+                </mxCell>
+                <mxCell id="c37" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="Wire.ReadResponse&lt;br&gt;FileLength set?" vertex="1">
+                    <mxGeometry height="50" width="330" x="760" y="735" as="geometry"/>
+                </mxCell>
+                <mxCell id="c38" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="ReceiveFile: bytes → savePath.tmp&lt;br&gt;→ File.Move(tmp, savePath)&lt;br&gt;(dropped connection → .tmp deleted)" vertex="1">
+                    <mxGeometry height="66" width="330" x="760" y="825" as="geometry"/>
+                </mxCell>
+                <mxCell id="c39" edge="1" parent="1" source="c32" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c33" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c40" edge="1" parent="1" source="c33" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c34" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c41" edge="1" parent="1" source="c34" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="c35" value="yes">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="925" y="570"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c42" edge="1" parent="1" source="c34" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="c36" value="no">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1240" y="570"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c43" edge="1" parent="1" source="c35" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c37" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c44" edge="1" parent="1" source="c37" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c38" value="yes">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c45" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=0;fillColor=#f5f5f5;strokeColor=#999999;fontColor=#333333;align=left;spacingLeft=8;" value="&lt;b&gt;Why FileLength is in the envelope&lt;/b&gt;&lt;br&gt;The server knows how many bytes follow even when it rejects the request.&lt;br&gt;It reads and discards them, so the client finishes sending and then reads the reply&lt;br&gt;instead of getting &quot;connection reset&quot;." vertex="1">
+                    <mxGeometry height="90" width="610" x="760" y="940" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="5._Lifecycle_&amp;_config" name="5. Lifecycle &amp; config">
+        <mxGraphModel dx="1380" dy="839" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="c3" parent="1" style="text;html=1;fontSize=20;fontStyle=1;align=left;verticalAlign=middle;" value="Starting, stopping and applying a new config" vertex="1">
+                    <mxGeometry height="40" width="900" x="40" y="10" as="geometry"/>
+                </mxCell>
+                <mxCell id="c4" parent="1" style="text;html=1;fontSize=12;align=left;verticalAlign=top;fontColor=#555555;whiteSpace=wrap;" value="The running server uses a copy of the config. Editing or saving ServerConfig changes nothing until Stop() + Start()." vertex="1">
+                    <mxGeometry height="25" width="1100" x="40" y="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="c5" parent="1" style="text;html=1;fontSize=14;align=left;" value="&lt;b&gt;Start(config)&lt;/b&gt;" vertex="1">
+                    <mxGeometry height="30" width="300" x="40" y="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="c6" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rhombus;fillColor=#fff2cc;strokeColor=#d6b656;" value="already running?" vertex="1">
+                    <mxGeometry height="80" width="200" x="90" y="130" as="geometry"/>
+                </mxCell>
+                <mxCell id="c7" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#f8cecc;strokeColor=#b85450;" value="throw InvalidOperationException" vertex="1">
+                    <mxGeometry height="40" width="300" x="40" y="240" as="geometry"/>
+                </mxCell>
+                <mxCell id="c8" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="config.Validate()&lt;br&gt;bad value → InvalidDataException" vertex="1">
+                    <mxGeometry height="50" width="300" x="40" y="310" as="geometry"/>
+                </mxCell>
+                <mxCell id="c9" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="snapshot = config.Clone()" vertex="1">
+                    <mxGeometry height="36" width="300" x="40" y="390" as="geometry"/>
+                </mxCell>
+                <mxCell id="c10" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Directory.CreateDirectory(StoragePath)" vertex="1">
+                    <mxGeometry height="36" width="300" x="40" y="456" as="geometry"/>
+                </mxCell>
+                <mxCell id="c11" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Sessions.Timeout = SessionTimeoutMinutes" vertex="1">
+                    <mxGeometry height="36" width="300" x="40" y="522" as="geometry"/>
+                </mxCell>
+                <mxCell id="c12" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="new TcpListener(Any, Port).Start()&lt;br&gt;port in use → SocketException" vertex="1">
+                    <mxGeometry height="50" width="300" x="40" y="588" as="geometry"/>
+                </mxCell>
+                <mxCell id="c13" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;arcSize=50;fillColor=#e1d5e7;strokeColor=#9673a6;" value="acceptLoop = AcceptLoop(listener, snapshot)&lt;br&gt;log &quot;Listening on port ...&quot;" vertex="1">
+                    <mxGeometry height="50" width="300" x="40" y="668" as="geometry"/>
+                </mxCell>
+                <mxCell id="c14" edge="1" parent="1" source="c6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c7" value="yes">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c15" edge="1" parent="1" source="c6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="c8" value="no">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="370" y="170"/>
+                            <mxPoint x="370" y="335"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c16" edge="1" parent="1" source="c8" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c9" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c17" edge="1" parent="1" source="c9" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c10" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c18" edge="1" parent="1" source="c10" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c11" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c19" edge="1" parent="1" source="c11" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c12" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c20" edge="1" parent="1" source="c12" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c13" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c21" parent="1" style="text;html=1;fontSize=14;align=left;" value="&lt;b&gt;Stop()&lt;/b&gt;" vertex="1">
+                    <mxGeometry height="30" width="300" x="440" y="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="c22" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="not running → return" vertex="1">
+                    <mxGeometry height="36" width="300" x="440" y="130" as="geometry"/>
+                </mxCell>
+                <mxCell id="c23" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="stopSource.Cancel()" vertex="1">
+                    <mxGeometry height="36" width="300" x="440" y="196" as="geometry"/>
+                </mxCell>
+                <mxCell id="c24" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="listener.Stop() – no new connections" vertex="1">
+                    <mxGeometry height="36" width="300" x="440" y="262" as="geometry"/>
+                </mxCell>
+                <mxCell id="c25" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="await acceptLoop" vertex="1">
+                    <mxGeometry height="36" width="300" x="440" y="328" as="geometry"/>
+                </mxCell>
+                <mxCell id="c26" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=0;fillColor=#f5f5f5;strokeColor=#999999;fontColor=#333333;" value="requests already running finish on their own&lt;br&gt;(with the old snapshot)" vertex="1">
+                    <mxGeometry height="50" width="300" x="440" y="394" as="geometry"/>
+                </mxCell>
+                <mxCell id="c27" edge="1" parent="1" source="c22" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c23" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c28" edge="1" parent="1" source="c23" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c24" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c29" edge="1" parent="1" source="c24" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c25" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c30" edge="1" parent="1" source="c25" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c26" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c31" parent="1" style="text;html=1;fontSize=14;align=left;" value="&lt;b&gt;Apply new config&lt;/b&gt; (admin GUI)" vertex="1">
+                    <mxGeometry height="30" width="400" x="840" y="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="c32" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="newConfig.Validate()&lt;br&gt;catches bad values with no downtime" vertex="1">
+                    <mxGeometry height="50" width="320" x="840" y="130" as="geometry"/>
+                </mxCell>
+                <mxCell id="c33" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="newConfig.Save(path) – optional" vertex="1">
+                    <mxGeometry height="36" width="320" x="840" y="210" as="geometry"/>
+                </mxCell>
+                <mxCell id="c34" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="await server.Stop()" vertex="1">
+                    <mxGeometry height="36" width="320" x="840" y="276" as="geometry"/>
+                </mxCell>
+                <mxCell id="c35" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="server.Start(newConfig)" vertex="1">
+                    <mxGeometry height="36" width="320" x="840" y="342" as="geometry"/>
+                </mxCell>
+                <mxCell id="c36" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rhombus;fillColor=#fff2cc;strokeColor=#d6b656;" value="exception?" vertex="1">
+                    <mxGeometry height="80" width="200" x="900" y="408" as="geometry"/>
+                </mxCell>
+                <mxCell id="c37" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;fillColor=#f8cecc;strokeColor=#b85450;" value="show error&lt;br&gt;server.Start(oldConfig)" vertex="1">
+                    <mxGeometry height="60" width="180" x="1190" y="418" as="geometry"/>
+                </mxCell>
+                <mxCell id="c38" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=1;arcSize=50;fillColor=#e1d5e7;strokeColor=#9673a6;" value="running with new config" vertex="1">
+                    <mxGeometry height="40" width="320" x="840" y="520" as="geometry"/>
+                </mxCell>
+                <mxCell id="c39" edge="1" parent="1" source="c32" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c33" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c40" edge="1" parent="1" source="c33" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c34" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c41" edge="1" parent="1" source="c34" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c35" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c42" edge="1" parent="1" source="c35" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c36" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c43" edge="1" parent="1" source="c36" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c37" value="yes">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c44" edge="1" parent="1" source="c36" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=10;endArrow=block;endFill=1;" target="c38" value="no">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="c45" parent="1" style="whiteSpace=wrap;html=1;fontSize=11;rounded=0;fillColor=#f5f5f5;strokeColor=#999999;fontColor=#333333;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;" value="&lt;b&gt;What survives a restart&lt;/b&gt;&lt;br&gt;• Logged-in sessions (TcpServer.Sessions) – users stay logged in&lt;br&gt;• New session timeout applies to existing sessions too&lt;br&gt;&lt;br&gt;&lt;b&gt;Watch out&lt;/b&gt;&lt;br&gt;• New port: clients must switch port&lt;br&gt;• New storage path: old files are NOT moved – move the folder first&lt;br&gt;• Between Stop and Start, new connections are refused" vertex="1">
+                    <mxGeometry height="170" width="530" x="840" y="600" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
