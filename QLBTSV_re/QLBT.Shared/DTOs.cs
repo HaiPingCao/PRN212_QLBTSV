@@ -58,6 +58,10 @@ public sealed class SubmissionDto
     public decimal? Score { get; set; }
 
     public string FileName { get; set; } = "";
+
+    public string? Comment { get; set; }
+
+    public int SubmitCount { get; set; }
 }
 
 public sealed class StudentAssignmentDto
@@ -69,6 +73,8 @@ public sealed class StudentAssignmentDto
     public string ClassName { get; set; } = "";
 
     public string Title { get; set; } = "";
+
+    public string? Description { get; set; }
 
     public DateTime DueDate { get; set; }
 
@@ -97,4 +103,93 @@ public sealed class SubmitResult
     public int SubmitCount { get; set; }
 
     public long Length { get; set; }
+}
+
+public sealed class ClassStudentDto
+{
+    public int StudentId { get; set; }
+
+    public string Username { get; set; } = "";
+
+    public string FullName { get; set; } = "";
+
+    public string Email { get; set; } = "";
+
+    /// <summary>Suspended in this class (class_students.is_active = 0).</summary>
+    public bool IsSuspended { get; set; }
+}
+
+public sealed class TeacherAssignmentDto
+{
+    public int Id { get; set; }
+
+    public int ClassId { get; set; }
+
+    public string Title { get; set; } = "";
+
+    public string? Description { get; set; }
+
+    public DateTime DueDate { get; set; }
+
+    public bool AllowLate { get; set; }
+
+    /// <summary>The manual close flag set by the teacher.</summary>
+    public bool IsClosedManually { get; set; }
+
+    /// <summary>IsClosed || (now > DueDate && !AllowLate). Grading is only allowed when true.</summary>
+    public bool IsClosed { get; set; }
+
+    public string? FileName { get; set; }
+
+    public DateTime CreatedAt { get; set; }
+
+    public int SubmissionCount { get; set; }
+
+    public int GradedCount { get; set; }
+}
+
+/// <summary>Body of CreateAssignment (POST) and UpdateAssignment (PUT). IsClosed is ignored on create.</summary>
+public sealed class AssignmentEditRequest
+{
+    public string Title { get; set; } = "";
+
+    public string? Description { get; set; }
+
+    public DateTime DueDate { get; set; }
+
+    public bool AllowLate { get; set; }
+
+    public bool IsClosed { get; set; }
+}
+
+public sealed class CreatedResult
+{
+    public int Id { get; set; }
+}
+
+public sealed class GradeRequest
+{
+    /// <summary>0 to 10, at most 2 decimals.</summary>
+    public decimal Score { get; set; }
+
+    public string? Comment { get; set; }
+}
+
+public sealed class MySubmissionDto
+{
+    public int Id { get; set; }
+
+    public int AssignmentId { get; set; }
+
+    public DateTime SubmittedAt { get; set; }
+
+    public bool IsLate { get; set; }
+
+    public int SubmitCount { get; set; }
+
+    public decimal? Score { get; set; }
+
+    public string? Comment { get; set; }
+
+    public string FileName { get; set; } = "";
 }
