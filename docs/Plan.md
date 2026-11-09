@@ -168,3 +168,34 @@ Mỗi request 1 kết nối TCP. Khung dữ liệu: `int` độ dài JSON → JS
 | `DownloadSubmission` | cả hai | submissionId                                                    | fileName, length                                              | ← server            |
 
 - Mọi thao tác đều kiểm tra quyền sở hữu: gv chỉ truy cập lớp mình dạy, sv chỉ truy cập lớp mình học và bài nộp của mình
+
+### Ánh xạ sang HTTP (server ASP.NET hiện tại)
+
+Server chính (`QLBTSV_re/QLBT.Server`) dùng HTTP thay cho khung TCP ở trên; trạng thái và quy tắc giữ nguyên. Hằng số route nằm trong `QLBT.Shared/ApiRoutes.cs`.
+
+- Xác thực: header `Authorization: Bearer {sessionId}` (trừ Login)
+- Lỗi: body `ApiError { status, error }`; mã HTTP: Ok 200, InvalidCredentials/Unauthorized 401, Forbidden 403, NotFound 404, Rejected 409, Error 500
+- Tải lên: `PUT` với body là byte file thô, tên gốc trong `?fileName=`; client gửi `Expect: 100-continue` để server từ chối trước khi nhận file
+- Tải về: `GET`, tên gốc trong `Content-Disposition`
+- `CreateAssignment` tách làm 2 bước: `POST` JSON tạo bài tập → `PUT` file đề bài
+
+| Type                       | HTTP                                                |
+| -------------------------- | --------------------------------------------------- |
+| `Login`                    | `POST /api/auth/login`                              |
+| `Logout`                   | `POST /api/auth/logout`                             |
+| `GetProfile`               | `GET /api/me`                                       |
+| `GetMyClasses`             | `GET /api/teacher/classes`                          |
+| `GetClassStudents`         | `GET /api/teacher/classes/{id}/students`            |
+| (DS bài tập của lớp, gv)   | `GET /api/teacher/classes/{id}/assignments`         |
+| `CreateAssignment`         | `POST /api/teacher/classes/{id}/assignments`        |
+| `UpdateAssignment`         | `PUT /api/teacher/assignments/{id}`                 |
+| (thay / tải đề bài, gv)    | `PUT` / `GET /api/teacher/assignments/{id}/file`    |
+| `DeleteAssignment`         | `DELETE /api/teacher/assignments/{id}`              |
+| `GetSubmissions`           | `GET /api/teacher/assignments/{id}/submissions`     |
+| `GradeSubmission`          | `PUT /api/teacher/submissions/{id}/grade`           |
+| `DeleteSubmission`         | `DELETE /api/teacher/submissions/{id}`              |
+| `GetMyAssignments`         | `GET /api/student/assignments`                      |
+| `DownloadAssignment`       | `GET /api/student/assignments/{id}/file`            |
+| `SubmitAssignment`         | `PUT /api/student/assignments/{id}/submission`      |
+| `GetMySubmission`          | `GET /api/student/assignments/{id}/submission`      |
+| `DownloadSubmission`       | `GET /api/submissions/{id}/file`                    |

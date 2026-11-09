@@ -19,6 +19,32 @@ public static class StudentEndpoints
         app.MapGet(ApiRoutes.StudentAssignments, GetMyAssignments).RequireAuthorization(Policies.Student);
         app.MapGet(ApiRoutes.StudentAssignmentFile, DownloadAssignment).RequireAuthorization(Policies.Student);
         app.MapPut(ApiRoutes.StudentSubmission, SubmitAssignment).RequireAuthorization(Policies.Student);
+        app.MapGet(ApiRoutes.StudentSubmission, GetMySubmission).RequireAuthorization(Policies.Student);
+    }
+
+    /// <summary>Score, comment and file name of my submission. Suspended students can still see it.</summary>
+    private static async Task<IResult> GetMySubmission(int id, ClaimsPrincipal user, Prn212PQlbtContext db)
+    {
+        int studentId = user.GetUserId();
+        MySubmissionDto? submission = await db.Submissions.AsNoTracking()
+            .Where(s => s.AssignmentId == id && s.StudentId == studentId)
+            .Select(s => new MySubmissionDto
+            {
+                Id = s.Id,
+                AssignmentId = s.AssignmentId,
+                SubmittedAt = s.SubmittedAt,
+                IsLate = s.IsLate,
+                SubmitCount = s.SubmitCount,
+                Score = s.Score,
+                Comment = s.Comment,
+                FileName = s.FileName
+            })
+            .FirstOrDefaultAsync();
+        if (submission == null)
+        {
+            return ApiResults.Fail(ApiStatus.NotFound, "You have not submitted this assignment.");
+        }
+        return Results.Ok(submission);
     }
 
     private static async Task<IResult> GetMyAssignments(ClaimsPrincipal user, Prn212PQlbtContext db)
@@ -33,6 +59,7 @@ public static class StudentEndpoints
                 ClassId = a.ClassId,
                 ClassName = cs.Class.Name,
                 Title = a.Title,
+                Description = a.Description,
                 DueDate = a.DueDate,
                 IsClosed = a.IsClosed || (now > a.DueDate && !a.AllowLate),
                 HasFile = a.FileName != null,
