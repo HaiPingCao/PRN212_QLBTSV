@@ -18,11 +18,17 @@
 --   GV001  3 lớp: SE1801 (SU26, đã xong), SE1802 (FA26), SE1804 (SP27, chưa bắt đầu)
 --   GV002  2 lớp FA26: SE1803, IA1801
 --   GV003  2 lớp: AI1801 (SU26), AI1802 (FA26)
---   GV004  chỉ có 1 lớp SP27 chưa có sinh viên
+--   GV004  2 lớp SP27 chưa có sinh viên: GD1801, SE1805
 --   HE180006 (id 10) bị đình chỉ ở SE1802, vẫn có điểm Lab 1 trước khi bị đình chỉ
 --   HE180013 (id 17) bị đình chỉ ở SE1803, đã có bài nộp được chấm
 --   HE180001 (id 5) học 3 lớp (SE1801, SE1802, AI1802) để xem dạng cây
 --   HE180020 (id 24) không thuộc lớp nào
+--
+--   Môn học (course):
+--     PRN212: SE1801 (SU26), SE1802 + SE1803 (FA26), SE1804 + SE1805 (SP27)
+--     SE1805 (SP27, PRN212) để thử quy tắc 1 lớp / môn / kì: HE180011, HE180012, HE180019 (đang học SE1804)
+--       không thêm được vào SE1805; sinh viên khác thì được
+--     SWP391 chưa có lớp nào -> xóa được
 --
 --   Bài tập (FA26):
 --     4  hết hạn, không cho nộp muộn  -> đóng theo hạn, đã chấm
@@ -38,6 +44,10 @@
 --     14 bài tập của lớp SP27 (kì chưa bắt đầu)
 -- =============================================
 
+-- class_students has a filtered unique index: inserts need QUOTED_IDENTIFIER ON (sqlcmd defaults to OFF).
+SET QUOTED_IDENTIFIER ON;
+GO
+
 USE PRN212_P_QLBT;
 GO
 
@@ -50,6 +60,7 @@ DELETE FROM submissions;
 DELETE FROM assignments;
 DELETE FROM class_students;
 DELETE FROM classes;
+DELETE FROM courses;
 DELETE FROM semesters;
 DELETE FROM users;
 
@@ -107,28 +118,47 @@ INSERT INTO semesters (id, name, start_date, end_date) VALUES
 SET IDENTITY_INSERT semesters OFF;
 
 -- =============================================
+-- COURSES
+-- =============================================
+
+SET IDENTITY_INSERT courses ON;
+
+INSERT INTO courses (id, code, name) VALUES
+    (1, 'PRN212',  N'Basic Cross-Platform Application Programming With .NET'),
+    (2, 'AIL303m', N'Machine Learning'),
+    (3, 'IAO202',  N'Introduction to Information Assurance'),
+    (4, 'DTG111',  N'Visual Design Tools'),
+    (5, 'SWP391',  N'Software Development Project');   -- chưa có lớp
+
+SET IDENTITY_INSERT courses OFF;
+
+-- =============================================
 -- CLASSES
 -- =============================================
 
 SET IDENTITY_INSERT classes ON;
 
-INSERT INTO classes (id, teacher_id, name, semester_id, major) VALUES
-    (1, 1, N'SE1801', 1, N'Kỹ thuật phần mềm'),
-    (2, 3, N'AI1801', 1, N'Trí tuệ nhân tạo'),
-    (3, 1, N'SE1802', 2, N'Kỹ thuật phần mềm'),
-    (4, 2, N'SE1803', 2, N'Kỹ thuật phần mềm'),
-    (5, 3, N'AI1802', 2, N'Trí tuệ nhân tạo'),
-    (6, 2, N'IA1801', 2, N'An toàn thông tin'),
-    (7, 1, N'SE1804', 3, N'Kỹ thuật phần mềm'),
-    (8, 4, N'GD1801', 3, N'Thiết kế đồ họa');
+INSERT INTO classes (id, teacher_id, name, semester_id, course_id) VALUES
+    (1, 1, N'SE1801', 1, 1),
+    (2, 3, N'AI1801', 1, 2),
+    (3, 1, N'SE1802', 2, 1),
+    (4, 2, N'SE1803', 2, 1),
+    (5, 3, N'AI1802', 2, 2),
+    (6, 2, N'IA1801', 2, 3),
+    (7, 1, N'SE1804', 3, 1),
+    (8, 4, N'GD1801', 3, 4),
+    (9, 4, N'SE1805', 3, 1);   -- PRN212 lần 2 trong SP27, chưa có sinh viên
 
 SET IDENTITY_INSERT classes OFF;
 
 -- =============================================
 -- CLASS_STUDENTS
+-- semester_id / course_id are copied from the class (the composite FK checks they match).
 -- =============================================
 
-INSERT INTO class_students (class_id, student_id, is_active, joined_at, left_at) VALUES
+DECLARE @enrol TABLE (class_id INT, student_id INT, is_active BIT, joined_at DATETIME, left_at DATETIME);
+
+INSERT INTO @enrol (class_id, student_id, is_active, joined_at, left_at) VALUES
     -- SE1801 (SU26)
     (1, 5,  1, '2026-04-28', NULL),
     (1, 6,  1, '2026-04-28', NULL),
@@ -171,7 +201,12 @@ INSERT INTO class_students (class_id, student_id, is_active, joined_at, left_at)
     (7, 15, 1, '2026-10-20', NULL),
     (7, 16, 1, '2026-10-20', NULL),
     (7, 23, 1, '2026-10-20', NULL);
-    -- GD1801 (SP27): chưa có sinh viên
+    -- GD1801, SE1805 (SP27): chưa có sinh viên
+
+INSERT INTO class_students (class_id, student_id, semester_id, course_id, is_active, joined_at, left_at)
+SELECT e.class_id, e.student_id, c.semester_id, c.course_id, e.is_active, e.joined_at, e.left_at
+FROM @enrol e
+JOIN classes c ON c.id = e.class_id;
 
 -- =============================================
 -- ASSIGNMENTS
@@ -328,6 +363,7 @@ GO
 
 SELECT 'users' AS [table], COUNT(*) AS [rows] FROM users
 UNION ALL SELECT 'semesters',      COUNT(*) FROM semesters
+UNION ALL SELECT 'courses',        COUNT(*) FROM courses
 UNION ALL SELECT 'classes',        COUNT(*) FROM classes
 UNION ALL SELECT 'class_students', COUNT(*) FROM class_students
 UNION ALL SELECT 'assignments',    COUNT(*) FROM assignments

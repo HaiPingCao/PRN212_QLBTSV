@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using QLBT.Server.Asp.SessionAndAuthentication;
+using QLBT.Server.Domain;
 using QLBT.Server.Models;
 using QLBT.Server.Files;
 using QLBT.Shared;
@@ -34,12 +35,13 @@ public static class TeacherEndpoints
         int teacherId = user.GetUserId();
         List<ClassDto> classes = await db.Classes.AsNoTracking()
             .Where(c => c.TeacherId == teacherId)
-            .OrderBy(c => c.SemesterId).ThenBy(c => c.Name)
+            .OrderBy(c => c.SemesterId).ThenBy(c => c.Course.Code).ThenBy(c => c.Name)
             .Select(c => new ClassDto
             {
                 Id = c.Id,
                 Name = c.Name,
-                Major = c.Major,
+                CourseCode = c.Course.Code,
+                CourseName = c.Course.Name,
                 Semester = c.Semester.Name,
                 StudentCount = c.ClassStudents.Count(cs => cs.IsActive)
             })
@@ -171,7 +173,7 @@ public static class TeacherEndpoints
             await transaction.CommitAsync();
         }
 
-        DeleteDirectoryQuietly(storage.AssignmentDirectory(assignment!.Class.SemesterId, assignment.ClassId, assignment.Id));
+        FileStorage.DeleteDirectoryQuietly(storage.AssignmentDirectory(assignment!.Class.SemesterId, assignment.ClassId, assignment.Id));
         return Results.Ok();
     }
 
@@ -359,22 +361,5 @@ public static class TeacherEndpoints
             return "Due date is required.";
         }
         return null;
-    }
-
-    private static void DeleteDirectoryQuietly(string path)
-    {
-        try
-        {
-            if (Directory.Exists(path))
-            {
-                Directory.Delete(path, recursive: true);
-            }
-        }
-        catch (IOException)
-        {
-        }
-        catch (UnauthorizedAccessException)
-        {
-        }
     }
 }

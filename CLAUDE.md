@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-QLBTSV: an assignment management app (giao / nộp / chấm bài tập) for the PRN212 course. There are two WPF apps, a Server and a Client, that talk over TCP on a LAN.
+QLBTSV: an assignment management app (giao / nộp / chấm bài tập) for the PRN212 course. There are two WPF apps, a Server and a Client, that talk over HTTP on a LAN (the Server hosts ASP.NET Core in-process; the original TCP design in Plan.md is mapped to HTTP routes).
 
 **The spec is [docs/Plan.md](docs/Plan.md).** Read it before you implement any feature. Follow its business rules and protocol exactly, and keep it up to date when a rule changes. Project docs are written in Vietnamese. Write code, identifiers and code comments in English.
 
@@ -21,26 +21,34 @@ Prototype/             Throwaway experiments. Reference only, do not ship.
                        %LocalAppData%\Svr3.Server\settings.json (ServerSettings); DB and limits stay in appsettings.json
     Svr3.Client        Console scenario runner: PASS/FAIL checks against db/QLBT_test_ds.sql
 QLBTSV_re/             Main solution (QLBTSV_re.sln)
-  QLBTSV_re.Shared     classlib: protocol DTOs, MessageType, Wire framing
-  QLBTSV_re.Server     WPF: admin GUI (direct DB access) and TCP server, EF Core, BCrypt
-  QLBTSV_re.Client     WPF: separate Teacher and Student UIs, talks to the server only over TCP
+  QLBT.Shared          classlib: ApiRoutes, ApiStatus, ApiJson, DTOs (shared by Server and Client)
+  QLBT.Server          WPF: admin GUI (direct DB access) + in-process ASP.NET Core HTTP API, EF Core, BCrypt
+    Asp/               ServerHost (DI, Kestrel), ServerRunner (Start/Stop), Endpoints/, SessionAndAuthentication/
+    Admin/             Admin services (User/Semester/Course/ClassAdminService): DB work + rule checks, return AdminResult;
+                       AdminLog (admin actions → "Server log" tab); Rows.cs (grid row models)
+    Data/DbFactory.cs  DbContexts for the admin GUI, from appsettings.json (works while the HTTP server is stopped)
+    Domain/            Rules shared by endpoints and admin GUI (AssignmentRules, SemesterRules, AdminResult)
+    Files/             FileStorage (id-based paths), FileReceiver (streamed upload to .tmp)
+    Models/            Scaffolded EF entities (never hand-edit)
+    Views/             Admin tabs (UsersView, SemestersView, CoursesView, ClassesView: editor on top, list below) + AddStudentsDialog
+  QLBT.Client          WPF (not created yet): separate Teacher and Student UIs, talks to the server only over HTTP
 ```
 
-The main solution is still being scaffolded. Create its projects by following `docs/ProjectCreation.md` (net8.0, with the package versions listed there). When you build the real Shared and Server code, port it from `Prototype/ServerVersion2`: the `Wire` framing, the `Request`/`Response` types, `RequestContext`, `SessionsManager` and `FileStorage`.
+Create missing projects by following `docs/ProjectCreation.md` (net8.0, with the package versions listed there). The Client's HTTP wrapper can be ported from `Prototype/ServerVersion3_ASP/Svr3.Client/ApiClient.cs`.
 
 ## Build and run
 
 - Requires the .NET 8 SDK and Visual Studio 2022 with ".NET desktop development" (see `.vsconfig`).
 - Build: `dotnet build QLBTSV_re/QLBTSV_re.sln`, or `dotnet build Prototype/Prototype.sln` for the prototypes.
 - Run: use the multi-startup "Run all" profile in VS, which starts the Server and Client together.
-- Database: `sqlcmd -S "(local)" -i db/QLBT.sql`, then scaffold the EF models into `QLBTSV_re.Server/Models` with `dotnet ef dbcontext scaffold ... --output-dir Models --no-onconfiguring --force` (the full command and why `--no-onconfiguring` is needed are in ProjectCreation.md). The context gets its connection string from DI (`AddDbContext` in `ServerHost.cs`), never from `OnConfiguring`. Don't hand-edit scaffolded entities. Change the schema in `db/QLBT.sql` and re-scaffold.
+- Database: `sqlcmd -S "(local)" -i db/QLBT.sql`, then scaffold the EF models into `QLBTSV_re/QLBT.Server/Models` with `dotnet ef dbcontext scaffold ... --output-dir Models --no-onconfiguring --force` (the full command and why `--no-onconfiguring` is needed are in ProjectCreation.md). The context gets its connection string from DI (`AddDbContext` in `ServerHost.cs`) for endpoints, or from `Data/DbFactory.Create()` for the admin GUI, never from `OnConfiguring` (`new Prn212PQlbtContext()` has no provider). Don't hand-edit scaffolded entities. Change the schema in `db/QLBT.sql` and re-scaffold.
 - Test data: `sqlcmd -S "(local)" -E -C -f 65001 -i db/QLBT_test_ds.sql` (run after QLBT.sql, safe to re-run). Every account's password is `123456`. The scenarios are listed in the file header.
 - The connection string goes in `appsettings.json` (Copy to Output Directory = Always). **Never commit real passwords.**
 
 ## Architecture rules
 
-- **Protocol:** one TCP connection carries one request. Frame = `int32 length (LE)` + UTF-8 JSON + optional file bytes, and the file bytes follow only when `FileLength` is set. Enums are serialized as names. The JSON limit is 1 MB; files are streamed with no limit. The order is: client `WriteRequest → [WriteFile] → ReadResponse → [ReadFile]`. When the server rejects an upload, it still drains the upload bytes before it responds.
-- **Statuses:** `Ok | InvalidCredentials | Unauthorized | Forbidden | NotFound | Rejected | Error`.
+- **Protocol (HTTP):** routes are constants in `QLBT.Shared/ApiRoutes.cs`; the operation → route table is in Plan.md ("Ánh xạ sang HTTP"). Auth = `Authorization: Bearer {sessionId}` (sessions in memory, lost on Stop). JSON is camelCase with enums as names (`ApiJson.Options`). Uploads are `PUT` with the raw file as the body and `?fileName=`; the client sends `Expect: 100-continue` and every check runs before the body is read. Downloads are `GET` with the name in `Content-Disposition`. Errors return an `ApiError { status, error }` body.
+- **Statuses:** `Ok | InvalidCredentials | Unauthorized | Forbidden | NotFound | Rejected | Error` (HTTP 200 / 401 / 401 / 403 / 404 / 409 / 500).
   - `Unauthorized`: no session, or the session is invalid. The client clears the SessionId and returns to the login screen.
   - `Forbidden`: wrong role, not the owner, or the student is suspended in that class.
   - `Rejected`: the user has permission but the request breaks a rule (assignment closed, submission already graded, semester already started).
@@ -50,7 +58,12 @@ The main solution is still being scaffolded. Create its projects by following `d
 - **File storage:** paths are built from IDs only: `storage/{semesterId}/{classId}/{assignmentId}/assignment` and `.../submissions/{submissionId}`. The original file name is stored in the DB.
 - **Deletes:** delete from the DB in a transaction first, then delete the files.
 - **Semesters and classes:** they can be edited or deleted only before the semester starts. After it starts, the start date is locked and the end date can only move later. A class never changes its semester.
-- The Server admin GUI works on the DB directly and does not go through TCP.
+- **Admin GUI:** works on the DB directly (not over HTTP), whether or not the server is running. Views are code-behind UserControls that stay thin: load → bind → call an `Admin/*Service` → show `AdminResult.Error`. Business rules live in the services / `Domain/`, not in views. One short-lived `DbFactory.Create()` context per operation.
+- **Users:** username and role are fixed after creation; a user with any class (taught or enrolled) cannot be deleted, suspend them in the class instead. Suspension (per class) can be toggled at any time: `is_active = 0, left_at = now` and back.
+- **Courses:** a class = group name + course + semester (`uq_classes` = name, semester_id, course_id); there is no major column. Teacher, course and name can change before the semester starts. A course used by a class cannot be deleted.
+- **One class per course per semester:** a student may be active in only one class of a course in a semester (suspended enrolments do not count). The DB enforces it: `class_students` copies `semester_id` / `course_id` from the class (composite FK, `ON UPDATE CASCADE`) and has the filtered unique index `uq_class_students_course`. `ClassAdminService` checks first for a readable message (add students, un-suspend, change course) and the picker hides students who would break it. Always set `SemesterId` / `CourseId` when inserting a `ClassStudent`.
+- **Changing a class's course:** EF treats `(Id, SemesterId, CourseId)` on `Class` as an alternate key and refuses to modify `CourseId`; update it with SQL (`ExecuteSqlInterpolatedAsync`), the DB cascades it to `class_students`.
+- **SQL scripts:** both start with `SET QUOTED_IDENTIFIER ON` (required by the filtered index; sqlcmd defaults to OFF).
 
 ## Code style
 
@@ -60,7 +73,7 @@ Match the prototype code:
 - Explicit types rather than `var`, braces on every block, and `sealed` classes by default.
 - Async I/O (`async Task`) for network and file work.
 - Short `///` XML doc comments on public members to explain intent and wire behavior.
-- Keep new `MessageType` values and handlers in sync with the operation table in Plan.md.
+- Keep new `ApiRoutes` and endpoint handlers in sync with the operation table and HTTP mapping in Plan.md.
 
 ## Git
 

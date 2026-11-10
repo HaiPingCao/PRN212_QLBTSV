@@ -1,23 +1,34 @@
 # QLBT
 
-Phần mềm có 2 bản: Server và Client. Giao tiếp qua TCP trong mạng LAN.
+Phần mềm có 2 bản: Server và Client. Giao tiếp qua mạng LAN (thiết kế ban đầu là TCP; bản hiện tại dùng HTTP, xem "Ánh xạ sang HTTP").
 
 ## Server
 
 Quản lý bằng GUI ngay trên máy chủ (thao tác trực tiếp với CSDL, không qua mạng).
 
-- Sinh viên
-- Giáo viên
-- Lớp
-  - Thêm mới
-  - Xóa, sửa nếu kì chưa bắt đầu
+- Sinh viên, Giáo viên (tab Users)
+  - Thêm mới: vai trò, mã đăng nhập (MSSV / MSGV), họ tên, email, mật khẩu (lưu BCrypt)
+  - Sửa họ tên, email; đặt lại mật khẩu. Mã đăng nhập và vai trò không đổi sau khi tạo
+  - Xóa chỉ khi chưa có lớp nào (dạy hoặc học); đã có lớp thì đình chỉ trong lớp
+- Môn học (tab Courses)
+  - Mã môn (vd. PRN212, duy nhất, chỉ ký tự ASCII) và tên môn
+  - Sửa mã / tên lúc nào cũng được (lớp tham chiếu theo id)
+  - Xóa chỉ khi chưa có lớp nào dùng môn đó
+- Lớp = nhóm lớp + môn + kì (vd. SE1802 · PRN212 · FA26)
+  - Thêm mới (chỉ vào kì chưa bắt đầu); 1 nhóm lớp chỉ có 1 lớp cho mỗi môn trong 1 kì
+  - Xóa, sửa (tên, môn, gv) nếu kì chưa bắt đầu (xóa lớp xóa luôn bài tập, bài nộp và thư mục file của lớp)
   - Thêm sinh viên vào lớp (chỉ khi kì chưa bắt đầu; sv lỡ đăng ký thì không được thêm)
-  - Đánh dấu đình chỉ sv (theo từng lớp, coi như xóa)
+  - Mỗi sv chỉ học 1 lớp / môn / kì (tính lớp đang tham gia, lớp bị đình chỉ coi như đã rời)
+    - CSDL bảo đảm: `class_students` lưu bản sao `semester_id`, `course_id` (khóa ngoại kép tới lớp) + chỉ mục unique có lọc `(student_id, semester_id, course_id) WHERE is_active = 1`
+    - Server kiểm tra trước để báo lỗi rõ ràng khi thêm sv, bỏ đình chỉ và đổi môn của lớp
+  - Gỡ sv khỏi lớp: chỉ khi kì chưa bắt đầu và sv chưa có bài nộp
+  - Đánh dấu đình chỉ sv (theo từng lớp, coi như xóa); bỏ đình chỉ được, lúc nào cũng được
   - Không bao giờ đổi kì học của lớp
 - Kì học
   - Thêm mới
-  - Xóa, sửa nếu kì chưa bắt đầu
+  - Xóa, sửa nếu kì chưa bắt đầu; xóa chỉ khi kì không còn lớp nào
   - Đã bắt đầu: khóa ngày bắt đầu, ngày kết thúc chỉ được lùi về sau
+- Giao diện: các tab Users, Semesters, Courses, Classes; mỗi tab có vùng sửa ở trên, danh sách ở dưới; tab Lớp có thêm danh sách sv của lớp đang chọn
 - File lưu trữ
   - Thư mục đặt theo ID, không theo tên (đổi tên trong CSDL không làm mất file):
 
@@ -41,7 +52,7 @@ Chia ra UI cho sv và gv riêng.
 ### Giáo viên
 
 - Lấy DS lớp đang đứng
-  - DS các lớp (Mã lớp, Chuyên ngành, sĩ số)
+  - DS các lớp (Mã lớp, Môn, sĩ số)
 - Xem thông tin lớp (Tên, MSSV, trạng thái đình chỉ)
 - Giao bài tập
   - Tải đề bài lên máy chủ
@@ -153,7 +164,7 @@ Mỗi request 1 kết nối TCP. Khung dữ liệu: `int` độ dài JSON → JS
 | `Login`              | cả hai | username, password                                              | thông tin user, vai trò, sessionId                            |                     |
 | `Logout`             | cả hai |                                                                 |                                                               |                     |
 | `GetProfile`         | cả hai |                                                                 | thông tin cá nhân                                             |                     |
-| `GetMyClasses`       | gv     |                                                                 | [classId, mã lớp, chuyên ngành, sĩ số]                        |                     |
+| `GetMyClasses`       | gv     |                                                                 | [classId, mã lớp, môn, sĩ số]                                 |                     |
 | `GetClassStudents`   | gv     | classId                                                         | [studentId, tên, MSSV, đình chỉ]                              |                     |
 | `CreateAssignment`   | gv     | classId, tên, hạn, allowLate, fileName, length                  | assignmentId                                                  | → server            |
 | `UpdateAssignment`   | gv     | assignmentId, tên, hạn, allowLate, isClosed, [fileName, length] |                                                               | → server (tùy chọn) |
@@ -161,7 +172,7 @@ Mỗi request 1 kết nối TCP. Khung dữ liệu: `int` độ dài JSON → JS
 | `GetSubmissions`     | gv     | assignmentId                                                    | [submissionId, sv, thời gian nộp, isLate, điểm]               |                     |
 | `GradeSubmission`    | gv     | submissionId, điểm, nhận xét                                    |                                                               |                     |
 | `DeleteSubmission`   | gv     | submissionId                                                    |                                                               |                     |
-| `GetMyAssignments`   | sv     |                                                                 | [assignmentId, lớp, tên, hạn, isClosed, lớp bị đình chỉ]      |                     |
+| `GetMyAssignments`   | sv     |                                                                 | [assignmentId, lớp, môn, tên, hạn, isClosed, lớp bị đình chỉ] |                     |
 | `DownloadAssignment` | sv     | assignmentId                                                    | fileName, length                                              | ← server            |
 | `SubmitAssignment`   | sv     | assignmentId, fileName, length                                  | submissionId, isLate                                          | → server            |
 | `GetMySubmission`    | sv     | assignmentId                                                    | submissionId, thời gian nộp, isLate, điểm, nhận xét, fileName |                     |

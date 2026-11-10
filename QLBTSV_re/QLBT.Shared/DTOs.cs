@@ -33,7 +33,10 @@ public sealed class ClassDto
 
     public string Name { get; set; } = "";
 
-    public string Major { get; set; } = "";
+    /// <summary>Course code, e.g. PRN212.</summary>
+    public string CourseCode { get; set; } = "";
+
+    public string CourseName { get; set; } = "";
 
     public string Semester { get; set; } = "";
 
@@ -71,6 +74,11 @@ public sealed class StudentAssignmentDto
     public int ClassId { get; set; }
 
     public string ClassName { get; set; } = "";
+
+    /// <summary>Course code of the class, e.g. PRN212 (for grouping the tree view).</summary>
+    public string CourseCode { get; set; } = "";
+
+    public string CourseName { get; set; } = "";
 
     public string Title { get; set; } = "";
 

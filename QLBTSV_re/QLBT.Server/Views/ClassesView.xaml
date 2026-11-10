@@ -1,0 +1,152 @@
+<UserControl x:Class="QLBT.Server.Views.ClassesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Loaded="View_Loaded" IsVisibleChanged="View_IsVisibleChanged" PreviewKeyDown="View_PreviewKeyDown">
+    <Grid x:Name="Root" Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" MinHeight="120" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" MinHeight="150" />
+        </Grid.RowDefinitions>
+
+        <!-- Class editor -->
+        <GroupBox Grid.Row="0" Style="{StaticResource EditorPanel}">
+            <GroupBox.Header>
+                <TextBlock x:Name="EditorTitle" Style="{StaticResource EditorTitle}" Text="New class" />
+            </GroupBox.Header>
+            <StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="100" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Semester:" Style="{StaticResource FieldLabel}" />
+                    <Grid Grid.Row="0" Grid.Column="1">
+                        <ComboBox x:Name="SemesterBox" DisplayMemberPath="Name" Width="160" HorizontalAlignment="Left"
+                                  Style="{StaticResource FieldBox}" ToolTip="Only semesters that have not started"
+                                  SelectionChanged="Field_Changed" />
+                        <TextBlock x:Name="SemesterLockedText" VerticalAlignment="Center" Margin="0,0,0,6" Visibility="Collapsed"
+                                   ToolTip="A class never changes its semester" />
+                    </Grid>
+                    <TextBlock Grid.Row="0" Grid.Column="2" Text="Course:" Style="{StaticResource FieldLabel}" />
+                    <ComboBox Grid.Row="0" Grid.Column="3" x:Name="CourseBox" DisplayMemberPath="Display" IsTextSearchEnabled="True"
+                              Style="{StaticResource FieldBox}" ToolTip="Manage courses in the Courses tab"
+                              SelectionChanged="Field_Changed" />
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Name:" Style="{StaticResource FieldLabel}" />
+                    <TextBox Grid.Row="1" Grid.Column="1" x:Name="NameBox" MaxLength="50" Width="160" HorizontalAlignment="Left"
+                             Style="{StaticResource FieldBox}" ToolTip="Class group, e.g. SE1802" TextChanged="Field_Changed" />
+                    <TextBlock Grid.Row="1" Grid.Column="2" Text="Teacher:" Style="{StaticResource FieldLabel}" />
+                    <ComboBox Grid.Row="1" Grid.Column="3" x:Name="TeacherBox" DisplayMemberPath="Display" IsTextSearchEnabled="True"
+                              Style="{StaticResource FieldBox}" SelectionChanged="Field_Changed" />
+                </Grid>
+
+                <TextBlock x:Name="InfoText" Style="{StaticResource InfoText}" Visibility="Collapsed" />
+                <TextBlock x:Name="ErrorText" Style="{StaticResource ErrorText}" Visibility="Collapsed" />
+
+                <DockPanel Margin="0,6,0,0">
+                    <Button x:Name="DeleteButton" DockPanel.Dock="Right" Content="Delete" Style="{StaticResource ToolbarButton}" Margin="0"
+                            Click="Delete_Click" />
+                    <Button DockPanel.Dock="Right" Content="+ New" Style="{StaticResource ToolbarButton}"
+                            ToolTip="Add a new class (Ctrl+N)" Click="New_Click" />
+                    <TextBlock x:Name="DirtyText" DockPanel.Dock="Right" Text="● Unsaved changes" Margin="0,0,12,0"
+                               VerticalAlignment="Center" Foreground="{StaticResource StatusWarnBrush}" Visibility="Collapsed" />
+                    <StackPanel Orientation="Horizontal">
+                        <Button x:Name="SaveButton" Content="Save" Style="{StaticResource ToolbarButton}" Click="Save_Click" />
+                        <Button x:Name="CancelButton" Content="Cancel" Style="{StaticResource ToolbarButton}" Click="Cancel_Click" />
+                    </StackPanel>
+                </DockPanel>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Class filter -->
+        <DockPanel Grid.Row="1" Margin="0,0,0,6">
+            <Button DockPanel.Dock="Right" Content="⟳ Refresh" Style="{StaticResource ToolbarButton}" Margin="0"
+                    ToolTip="Reload from the database (F5)" Click="Refresh_Click" />
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Semester:" VerticalAlignment="Center" Margin="0,0,6,0" />
+                <ComboBox x:Name="SemesterFilter" Width="140" DisplayMemberPath="Name" SelectionChanged="SemesterFilter_Changed" />
+                <TextBlock Text="Search:" VerticalAlignment="Center" Margin="16,0,6,0" />
+                <TextBox x:Name="SearchBox" Width="200" VerticalContentAlignment="Center" ToolTip="Class, course or teacher"
+                         TextChanged="Search_Changed" />
+                <TextBlock x:Name="ClassFooterText" VerticalAlignment="Center" Margin="16,0,0,0"
+                           Foreground="{StaticResource StatusMutedBrush}" />
+            </StackPanel>
+        </DockPanel>
+
+        <!-- Classes -->
+        <DataGrid Grid.Row="2" x:Name="ClassesGrid" SelectionChanged="ClassesGrid_SelectionChanged"
+                  PreviewKeyDown="ClassesGrid_PreviewKeyDown">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="100" />
+                <DataGridTextColumn Header="Course" Binding="{Binding CourseCode}" Width="90" />
+                <DataGridTextColumn Header="Course name" Binding="{Binding CourseName}" Width="2*" />
+                <DataGridTextColumn Header="Semester" Binding="{Binding SemesterName}" Width="90" />
+                <DataGridTextColumn Header="Teacher" Binding="{Binding TeacherDisplay}" Width="2*" />
+                <DataGridTextColumn Header="Students (active / total)" Binding="{Binding StudentsText}" Width="150" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <GridSplitter Grid.Row="3" Height="6" HorizontalAlignment="Stretch" Margin="0,4" Background="#E0E6EE"
+                      ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" ToolTip="Drag to resize" />
+
+        <!-- Students of the selected class -->
+        <Grid Grid.Row="4">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <DockPanel Grid.Row="0" Margin="0,2,0,6">
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button x:Name="AddStudentsButton" Content="+ Add students" Style="{StaticResource ToolbarButton}"
+                            Click="AddStudents_Click" />
+                    <Button x:Name="RemoveButton" Content="Remove" Style="{StaticResource ToolbarButton}" Click="Remove_Click" />
+                    <Button x:Name="SuspendButton" Content="Suspend" Style="{StaticResource ToolbarButton}" Click="Suspend_Click" />
+                    <Button x:Name="UnsuspendButton" Content="Un-suspend" Style="{StaticResource ToolbarButton}" Margin="0"
+                            Click="Unsuspend_Click" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock x:Name="StudentsTitle" Style="{StaticResource EditorTitle}" Text="Students" Margin="0,0,16,0" />
+                    <TextBlock Text="Search:" VerticalAlignment="Center" Margin="0,0,6,0" />
+                    <TextBox x:Name="StudentSearchBox" Width="150" VerticalContentAlignment="Center" TextChanged="StudentFilter_Changed" />
+                    <CheckBox x:Name="SuspendedOnlyBox" Content="Suspended only" VerticalAlignment="Center" Margin="12,0,0,0"
+                              Checked="StudentFilter_Changed" Unchecked="StudentFilter_Changed" />
+                </StackPanel>
+            </DockPanel>
+
+            <DataGrid Grid.Row="1" x:Name="StudentsGrid" SelectionChanged="StudentsGrid_SelectionChanged">
+                <DataGrid.RowStyle>
+                    <Style TargetType="DataGridRow">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsActive}" Value="False">
+                                <Setter Property="Foreground" Value="{StaticResource StatusMutedBrush}" />
+                                <Setter Property="FontStyle" Value="Italic" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.RowStyle>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Username" Binding="{Binding Username}" Width="110" />
+                    <DataGridTextColumn Header="Full name" Binding="{Binding FullName}" Width="2*" />
+                    <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="2*" />
+                    <DataGridTextColumn Header="Status" Binding="{Binding StatusText}" Width="90" />
+                    <DataGridTextColumn Header="Joined" Binding="{Binding JoinedAt, StringFormat=dd/MM/yyyy}" Width="90" />
+                    <DataGridTextColumn Header="Left" Binding="{Binding LeftAt, StringFormat=dd/MM/yyyy}" Width="90" />
+                </DataGrid.Columns>
+            </DataGrid>
+            <TextBlock Grid.Row="1" x:Name="StudentsEmptyText" Text="Select a class to see its students." HorizontalAlignment="Center"
+                       VerticalAlignment="Center" Foreground="{StaticResource StatusMutedBrush}" IsHitTestVisible="False" />
+            <TextBlock Grid.Row="2" x:Name="StudentFooterText" Style="{StaticResource FooterText}" />
+        </Grid>
+    </Grid>
+</UserControl>

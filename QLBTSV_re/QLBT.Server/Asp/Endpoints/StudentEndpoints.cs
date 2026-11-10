@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using QLBT.Server.Asp.SessionAndAuthentication;
 using QLBT.Server.Files;
+using QLBT.Server.Domain;
 using QLBT.Server.Models;
 using QLBT.Shared;
 using System.IO;
@@ -58,6 +59,8 @@ public static class StudentEndpoints
                 Id = a.Id,
                 ClassId = a.ClassId,
                 ClassName = cs.Class.Name,
+                CourseCode = cs.Class.Course.Code,
+                CourseName = cs.Class.Course.Name,
                 Title = a.Title,
                 Description = a.Description,
                 DueDate = a.DueDate,
