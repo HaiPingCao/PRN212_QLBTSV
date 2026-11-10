@@ -1,0 +1,44 @@
+<Window x:Class="QLBT.Server.Views.AddStudentsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Add students" Width="640" Height="520" MinWidth="480" MinHeight="360"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Loaded="Window_Loaded">
+    <DockPanel Margin="12">
+        <DockPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+            <TextBlock x:Name="TitleText" DockPanel.Dock="Top" Style="{StaticResource EditorTitle}" Margin="0,0,0,8" />
+            <TextBlock Text="Search:" VerticalAlignment="Center" Margin="0,0,6,0" />
+            <TextBox x:Name="SearchBox" VerticalContentAlignment="Center" ToolTip="Username, name or email"
+                     TextChanged="Search_Changed" />
+        </DockPanel>
+
+        <DockPanel DockPanel.Dock="Bottom" Margin="0,8,0,0">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <Button x:Name="AddButton" Content="Add" Style="{StaticResource ToolbarButton}" IsDefault="True" Click="Add_Click" />
+                <Button Content="Cancel" Style="{StaticResource ToolbarButton}" Margin="0" IsCancel="True" />
+            </StackPanel>
+            <StackPanel>
+                <TextBlock x:Name="SelectedText" VerticalAlignment="Center" Text="0 selected" />
+                <TextBlock x:Name="ErrorText" Style="{StaticResource ErrorText}" Visibility="Collapsed" />
+            </StackPanel>
+        </DockPanel>
+
+        <DataGrid x:Name="StudentsGrid">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Width="40">
+                    <DataGridTemplateColumn.Header>
+                        <CheckBox x:Name="SelectAllBox" ToolTip="Select all visible" Click="SelectAll_Click" />
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center"
+                                      Click="RowCheck_Click" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Username" Binding="{Binding Username}" Width="110" />
+                <DataGridTextColumn Header="Full name" Binding="{Binding FullName}" Width="2*" />
+                <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="2*" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+</Window>

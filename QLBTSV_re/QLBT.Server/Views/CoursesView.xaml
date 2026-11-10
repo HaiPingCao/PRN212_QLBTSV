@@ -1,0 +1,76 @@
+<UserControl x:Class="QLBT.Server.Views.CoursesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Loaded="View_Loaded" PreviewKeyDown="View_PreviewKeyDown">
+    <Grid x:Name="Root" Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Editor -->
+        <GroupBox Grid.Row="0" Style="{StaticResource EditorPanel}">
+            <GroupBox.Header>
+                <TextBlock x:Name="EditorTitle" Style="{StaticResource EditorTitle}" Text="New course" />
+            </GroupBox.Header>
+            <StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="100" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0" Text="Code:" Style="{StaticResource FieldLabel}" />
+                    <TextBox Grid.Column="1" x:Name="CodeBox" MaxLength="20" Width="160" HorizontalAlignment="Left"
+                             Style="{StaticResource FieldBox}" ToolTip="e.g. PRN212" TextChanged="Field_Changed" />
+                    <TextBlock Grid.Column="2" Text="Name:" Style="{StaticResource FieldLabel}" />
+                    <TextBox Grid.Column="3" x:Name="NameBox" MaxLength="100" Style="{StaticResource FieldBox}"
+                             TextChanged="Field_Changed" />
+                </Grid>
+
+                <TextBlock x:Name="InfoText" Style="{StaticResource InfoText}" Visibility="Collapsed" />
+                <TextBlock x:Name="ErrorText" Style="{StaticResource ErrorText}" Visibility="Collapsed" />
+
+                <DockPanel Margin="0,6,0,0">
+                    <Button x:Name="DeleteButton" DockPanel.Dock="Right" Content="Delete" Style="{StaticResource ToolbarButton}" Margin="0"
+                            Click="Delete_Click" />
+                    <Button DockPanel.Dock="Right" Content="+ New" Style="{StaticResource ToolbarButton}"
+                            ToolTip="Add a new course (Ctrl+N)" Click="New_Click" />
+                    <TextBlock x:Name="DirtyText" DockPanel.Dock="Right" Text="● Unsaved changes" Margin="0,0,12,0"
+                               VerticalAlignment="Center" Foreground="{StaticResource StatusWarnBrush}" Visibility="Collapsed" />
+                    <StackPanel Orientation="Horizontal">
+                        <Button x:Name="SaveButton" Content="Save" Style="{StaticResource ToolbarButton}" ToolTip="Save (Ctrl+S)"
+                                Click="Save_Click" />
+                        <Button Content="Cancel" Style="{StaticResource ToolbarButton}" Click="Cancel_Click" />
+                    </StackPanel>
+                </DockPanel>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Filter row -->
+        <DockPanel Grid.Row="1" Margin="0,0,0,6">
+            <Button DockPanel.Dock="Right" Content="⟳ Refresh" Style="{StaticResource ToolbarButton}" Margin="0"
+                    ToolTip="Reload from the database (F5)" Click="Refresh_Click" />
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Search:" VerticalAlignment="Center" Margin="0,0,6,0" />
+                <TextBox x:Name="SearchBox" Width="240" VerticalContentAlignment="Center" ToolTip="Code or name"
+                         TextChanged="Search_Changed" />
+            </StackPanel>
+        </DockPanel>
+
+        <!-- List -->
+        <DataGrid Grid.Row="2" x:Name="CoursesGrid" SelectionChanged="Grid_SelectionChanged" PreviewKeyDown="Grid_PreviewKeyDown">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Code" Binding="{Binding Code}" Width="120" />
+                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="3*" />
+                <DataGridTextColumn Header="Classes" Binding="{Binding ClassCount}" Width="80" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <TextBlock Grid.Row="3" x:Name="FooterText" Style="{StaticResource FooterText}" />
+    </Grid>
+</UserControl>

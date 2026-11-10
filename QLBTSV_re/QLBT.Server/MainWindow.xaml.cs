@@ -1,5 +1,9 @@
-﻿using Microsoft.Win32;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Win32;
+using QLBT.Server.Admin;
 using QLBT.Server.Asp;
+using QLBT.Server.Data;
+using QLBT.Server.Models;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Net;
@@ -21,15 +25,14 @@ namespace QLBT.Server
         private ServerSettings _settings;
         private bool _busy;
 
-
-
-
         public MainWindow(ServerRunner runner, UiLoggerProvider log)
         {
             InitializeComponent();
             _runner = runner;
             LogList.ItemsSource = _lines;
             log.LineWritten += AppendLog;
+            AdminLog.LineWritten += AppendLog;
+            Loaded += async (sender, e) => await CheckDatabase();
 
             foreach (string address in GetLocalAddresses())
             {
@@ -230,7 +233,35 @@ namespace QLBT.Server
                 StatusText.Text = "Stopped";
                 //StatusText.Foreground = Brushes.Gray;
             }
+            ServerStatusText.Text = "● Server " + (_runner.IsRunning ? StatusText.Text.Replace("Running", "running") : "stopped");
+            ServerStatusText.Foreground = (System.Windows.Media.Brush)FindResource(_runner.IsRunning ? "StatusOkBrush" : "StatusMutedBrush");
             UpdateButtons();
+        }
+
+        /// <summary>One connection test at startup so a wrong connection string shows up before the admin opens a tab.</summary>
+        private async Task CheckDatabase()
+        {
+            string text;
+            bool ok;
+            try
+            {
+                using (Prn212PQlbtContext db = DbFactory.Create())
+                {
+                    ok = await db.Database.CanConnectAsync();
+                    text = ok ? "DB: " + db.Database.GetDbConnection().Database + "  OK" : "DB: cannot connect";
+                }
+            }
+            catch (Exception ex)
+            {
+                ok = false;
+                text = "DB: error (" + ex.GetBaseException().Message + ")";
+            }
+            DbStatusText.Text = text;
+            DbStatusText.Foreground = (System.Windows.Media.Brush)FindResource(ok ? "StatusOkBrush" : "ErrorBrush");
+            if (!ok)
+            {
+                Log("Database check failed: " + text + ". Check ConnectionStrings:Default in appsettings.json.");
+            }
         }
 
         /// <summary>Address, port and path are editable only while stopped; they apply on the next Start.</summary>

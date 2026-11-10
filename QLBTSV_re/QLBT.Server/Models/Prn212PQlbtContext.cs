@@ -17,6 +17,8 @@ public partial class Prn212PQlbtContext : DbContext
 
     public virtual DbSet<ClassStudent> ClassStudents { get; set; }
 
+    public virtual DbSet<Course> Courses { get; set; }
+
     public virtual DbSet<Role> Roles { get; set; }
 
     public virtual DbSet<Semester> Semesters { get; set; }
@@ -29,7 +31,7 @@ public partial class Prn212PQlbtContext : DbContext
     {
         modelBuilder.Entity<Assignment>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__assignme__3213E83F97BB3576");
+            entity.HasKey(e => e.Id).HasName("PK__assignme__3213E83FCFF83868");
 
             entity.ToTable("assignments");
 
@@ -64,21 +66,26 @@ public partial class Prn212PQlbtContext : DbContext
 
         modelBuilder.Entity<Class>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__classes__3213E83F8A94AE8C");
+            entity.HasKey(e => e.Id).HasName("PK__classes__3213E83F50844E31");
 
             entity.ToTable("classes");
 
-            entity.HasIndex(e => new { e.Name, e.SemesterId, e.Major }, "uq_classes").IsUnique();
+            entity.HasIndex(e => new { e.Name, e.SemesterId, e.CourseId }, "uq_classes").IsUnique();
+
+            entity.HasIndex(e => new { e.Id, e.SemesterId, e.CourseId }, "uq_classes_semester_course").IsUnique();
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Major)
-                .HasMaxLength(100)
-                .HasColumnName("major");
+            entity.Property(e => e.CourseId).HasColumnName("course_id");
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
                 .HasColumnName("name");
             entity.Property(e => e.SemesterId).HasColumnName("semester_id");
             entity.Property(e => e.TeacherId).HasColumnName("teacher_id");
+
+            entity.HasOne(d => d.Course).WithMany(p => p.Classes)
+                .HasForeignKey(d => d.CourseId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_classes_courses");
 
             entity.HasOne(d => d.Semester).WithMany(p => p.Classes)
                 .HasForeignKey(d => d.SemesterId)
@@ -93,12 +100,17 @@ public partial class Prn212PQlbtContext : DbContext
 
         modelBuilder.Entity<ClassStudent>(entity =>
         {
-            entity.HasKey(e => new { e.ClassId, e.StudentId }).HasName("PK__class_st__4F5749EF85DF922D");
+            entity.HasKey(e => new { e.ClassId, e.StudentId }).HasName("PK__class_st__4F5749EFBDFB0574");
 
             entity.ToTable("class_students");
 
+            entity.HasIndex(e => new { e.StudentId, e.SemesterId, e.CourseId }, "uq_class_students_course")
+                .IsUnique()
+                .HasFilter("([is_active]=(1))");
+
             entity.Property(e => e.ClassId).HasColumnName("class_id");
             entity.Property(e => e.StudentId).HasColumnName("student_id");
+            entity.Property(e => e.CourseId).HasColumnName("course_id");
             entity.Property(e => e.IsActive)
                 .HasDefaultValue(true)
                 .HasColumnName("is_active");
@@ -109,24 +121,44 @@ public partial class Prn212PQlbtContext : DbContext
             entity.Property(e => e.LeftAt)
                 .HasColumnType("datetime")
                 .HasColumnName("left_at");
-
-            entity.HasOne(d => d.Class).WithMany(p => p.ClassStudents)
-                .HasForeignKey(d => d.ClassId)
-                .HasConstraintName("fk_class_students_classes");
+            entity.Property(e => e.SemesterId).HasColumnName("semester_id");
 
             entity.HasOne(d => d.Student).WithMany(p => p.ClassStudents)
                 .HasForeignKey(d => d.StudentId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_class_students_users");
+
+            entity.HasOne(d => d.Class).WithMany(p => p.ClassStudents)
+                .HasPrincipalKey(p => new { p.Id, p.SemesterId, p.CourseId })
+                .HasForeignKey(d => new { d.ClassId, d.SemesterId, d.CourseId })
+                .HasConstraintName("fk_class_students_classes");
+        });
+
+        modelBuilder.Entity<Course>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__courses__3213E83F7E0DEA0C");
+
+            entity.ToTable("courses");
+
+            entity.HasIndex(e => e.Code, "UQ__courses__357D4CF913A20776").IsUnique();
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Code)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasColumnName("code");
+            entity.Property(e => e.Name)
+                .HasMaxLength(100)
+                .HasColumnName("name");
         });
 
         modelBuilder.Entity<Role>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__roles__3213E83F95F61B6C");
+            entity.HasKey(e => e.Id).HasName("PK__roles__3213E83F6C0EC365");
 
             entity.ToTable("roles");
 
-            entity.HasIndex(e => e.Name, "UQ__roles__72E12F1B7024BCD4").IsUnique();
+            entity.HasIndex(e => e.Name, "UQ__roles__72E12F1B9FD682CB").IsUnique();
 
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
@@ -139,11 +171,11 @@ public partial class Prn212PQlbtContext : DbContext
 
         modelBuilder.Entity<Semester>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__semester__3213E83FBDFB545B");
+            entity.HasKey(e => e.Id).HasName("PK__semester__3213E83FC0004D88");
 
             entity.ToTable("semesters");
 
-            entity.HasIndex(e => e.Name, "UQ__semester__72E12F1B1DA44F70").IsUnique();
+            entity.HasIndex(e => e.Name, "UQ__semester__72E12F1BB61EBB44").IsUnique();
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.EndDate).HasColumnName("end_date");
@@ -155,7 +187,7 @@ public partial class Prn212PQlbtContext : DbContext
 
         modelBuilder.Entity<Submission>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__submissi__3213E83F063F84EE");
+            entity.HasKey(e => e.Id).HasName("PK__submissi__3213E83F22EF0069");
 
             entity.ToTable("submissions");
 
@@ -197,13 +229,13 @@ public partial class Prn212PQlbtContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__users__3213E83F5521576E");
+            entity.HasKey(e => e.Id).HasName("PK__users__3213E83FE21717A6");
 
             entity.ToTable("users");
 
-            entity.HasIndex(e => e.Email, "UQ__users__AB6E6164AB12D27B").IsUnique();
+            entity.HasIndex(e => e.Email, "UQ__users__AB6E6164272117CC").IsUnique();
 
-            entity.HasIndex(e => e.Username, "UQ__users__F3DBC57237C3ECC2").IsUnique();
+            entity.HasIndex(e => e.Username, "UQ__users__F3DBC5728B409624").IsUnique();
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Email)

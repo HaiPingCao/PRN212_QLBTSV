@@ -13,11 +13,13 @@ public partial class Class
 
     public int SemesterId { get; set; }
 
-    public string Major { get; set; } = null!;
+    public int CourseId { get; set; }
 
     public virtual ICollection<Assignment> Assignments { get; set; } = new List<Assignment>();
 
     public virtual ICollection<ClassStudent> ClassStudents { get; set; } = new List<ClassStudent>();
+
+    public virtual Course Course { get; set; } = null!;
 
     public virtual Semester Semester { get; set; } = null!;
 

@@ -18,6 +18,30 @@ public sealed class FileStorage
         Root = Path.GetFullPath(root);
     }
 
+    /// <summary>Deleting a class = deleting this folder.</summary>
+    public string ClassDirectory(int semesterId, int classId)
+    {
+        return Path.Combine(Root, Id(semesterId), Id(classId));
+    }
+
+    /// <summary>Best effort: a file still open elsewhere must not fail a delete that is already committed in the DB.</summary>
+    public static void DeleteDirectoryQuietly(string path)
+    {
+        try
+        {
+            if (Directory.Exists(path))
+            {
+                Directory.Delete(path, recursive: true);
+            }
+        }
+        catch (IOException)
+        {
+        }
+        catch (UnauthorizedAccessException)
+        {
+        }
+    }
+
     /// <summary>Deleting an assignment = deleting this folder.</summary>
     public string AssignmentDirectory(int semesterId, int classId, int assignmentId)
     {

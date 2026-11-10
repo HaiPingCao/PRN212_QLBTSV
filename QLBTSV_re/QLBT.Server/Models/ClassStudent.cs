@@ -9,6 +9,10 @@ public partial class ClassStudent
 
     public int StudentId { get; set; }
 
+    public int SemesterId { get; set; }
+
+    public int CourseId { get; set; }
+
     public bool IsActive { get; set; }
 
     public DateTime JoinedAt { get; set; }
