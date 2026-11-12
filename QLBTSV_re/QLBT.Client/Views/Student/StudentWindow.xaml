@@ -1,0 +1,206 @@
+<Window x:Class="QLBT.Client.Views.Student.StudentWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:QLBT.Client.Views.Student"
+        Title="QLBT – Student" Width="1100" Height="720" MinWidth="900" MinHeight="560"
+        WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" Closed="Window_Closed" PreviewKeyDown="Window_PreviewKeyDown">
+    <Window.Resources>
+        <HierarchicalDataTemplate DataType="{x:Type local:StudentClassGroup}" ItemsSource="{Binding Items}">
+            <TextBlock Text="{Binding Header}" FontWeight="SemiBold" ToolTip="{Binding ToolTip}" Margin="0,2">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsSuspended}" Value="True">
+                                <Setter Property="Foreground" Value="{StaticResource StatusMutedBrush}" />
+                                <Setter Property="FontStyle" Value="Italic" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </HierarchicalDataTemplate>
+        <DataTemplate DataType="{x:Type local:StudentAssignmentItem}">
+            <StackPanel Orientation="Horizontal" Margin="0,1">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsInactive}" Value="True">
+                                <Setter Property="TextElement.Foreground" Value="{StaticResource StatusMutedBrush}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <TextBlock Text="{Binding Title}" Width="190" TextTrimming="CharacterEllipsis" ToolTip="{Binding Title}" />
+                <TextBlock Text="{Binding DueText}" Width="110" />
+                <TextBlock Text="{Binding StatusText}" />
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Header bar -->
+        <DockPanel Grid.Row="0" Margin="0,0,0,8">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <Button Content="Profile" Style="{StaticResource ToolbarButton}" Click="Profile_Click" />
+                <Button Content="⟳ Refresh" Style="{StaticResource ToolbarButton}" ToolTip="Reload (F5)" Click="Refresh_Click" />
+                <Button Content="Logout" Style="{StaticResource ToolbarButton}" Margin="0" Click="Logout_Click" />
+            </StackPanel>
+            <TextBlock x:Name="UserText" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center" />
+        </DockPanel>
+
+        <Grid Grid.Row="2" x:Name="Root">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="430" MinWidth="320" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" MinWidth="380" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Assignment list -->
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,6">
+                    <TextBlock Text="View:" VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <RadioButton x:Name="ByClassRadio" Content="By class" IsChecked="True" VerticalAlignment="Center" Margin="0,0,12,0"
+                                 Checked="View_Changed" />
+                    <RadioButton x:Name="ByDueRadio" Content="By due date" VerticalAlignment="Center" Margin="0,0,16,0"
+                                 Checked="View_Changed" />
+                    <CheckBox x:Name="HideClosedBox" Content="Hide closed" VerticalAlignment="Center"
+                              Checked="View_Changed" Unchecked="View_Changed" />
+                </StackPanel>
+
+                <TreeView Grid.Row="1" x:Name="AssignmentTree" SelectedItemChanged="AssignmentTree_SelectedItemChanged"
+                          BorderBrush="{StaticResource EditorBorderBrush}">
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="TreeViewItem">
+                            <Setter Property="IsExpanded" Value="True" />
+                            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                        </Style>
+                    </TreeView.ItemContainerStyle>
+                </TreeView>
+
+                <DataGrid Grid.Row="1" x:Name="DueGrid" Visibility="Collapsed" SelectionChanged="DueGrid_SelectionChanged">
+                    <DataGrid.RowStyle>
+                        <Style TargetType="DataGridRow">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsInactive}" Value="True">
+                                    <Setter Property="Foreground" Value="{StaticResource StatusMutedBrush}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.RowStyle>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Due" Binding="{Binding DueText}" Width="110" SortMemberPath="DueDate" />
+                        <DataGridTextColumn Header="Class" Binding="{Binding ClassDisplay}" Width="120" />
+                        <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="*" />
+                        <DataGridTextColumn Header="Status" Binding="{Binding StatusText}" Width="70" />
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <TextBlock Grid.Row="1" x:Name="ListEmptyText" Style="{StaticResource EmptyText}" Text="No assignments." Visibility="Collapsed" />
+                <TextBlock Grid.Row="2" x:Name="CountText" Style="{StaticResource FooterText}" />
+            </Grid>
+
+            <GridSplitter Grid.Column="1" Width="6" Margin="4,0" HorizontalAlignment="Stretch" Background="#E0E6EE"
+                          ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" />
+
+            <!-- Detail of the selected assignment -->
+            <Grid Grid.Column="2">
+                <TextBlock x:Name="DetailEmptyText" Style="{StaticResource EmptyText}" Text="Select an assignment to see its details." />
+                <ScrollViewer x:Name="DetailPanel" VerticalScrollBarVisibility="Auto" Visibility="Collapsed">
+                    <StackPanel>
+                        <GroupBox Style="{StaticResource EditorPanel}">
+                            <GroupBox.Header>
+                                <TextBlock x:Name="AssignmentTitle" Style="{StaticResource EditorTitle}" />
+                            </GroupBox.Header>
+                            <StackPanel>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="70" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="60" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Text="Class:" Style="{StaticResource FieldLabel}" />
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" x:Name="ClassText" Style="{StaticResource ValueText}" />
+                                    <TextBlock Grid.Row="1" Text="Due:" Style="{StaticResource FieldLabel}" />
+                                    <TextBlock Grid.Row="1" Grid.Column="1" x:Name="DueText" Style="{StaticResource ValueText}" />
+                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="Status:" Style="{StaticResource FieldLabel}" />
+                                    <TextBlock Grid.Row="1" Grid.Column="3" x:Name="StatusValueText" Style="{StaticResource ValueText}" FontWeight="SemiBold" />
+                                </Grid>
+                                <GroupBox Header="Description" Margin="0,4,0,8">
+                                    <TextBox x:Name="DescriptionBox" Style="{StaticResource ReadOnlyTextBox}" MaxHeight="220" />
+                                </GroupBox>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button x:Name="DownloadAssignmentButton" Content="Download assignment file" Style="{StaticResource ToolbarButton}"
+                                            Click="DownloadAssignment_Click" />
+                                </StackPanel>
+                                <TextBlock x:Name="AssignmentInfo" Style="{StaticResource InfoText}" Visibility="Collapsed" />
+                            </StackPanel>
+                        </GroupBox>
+
+                        <GroupBox Style="{StaticResource EditorPanel}">
+                            <GroupBox.Header>
+                                <TextBlock Text="My submission" Style="{StaticResource EditorTitle}" />
+                            </GroupBox.Header>
+                            <StackPanel>
+                                <TextBlock x:Name="SubmissionStateText" Style="{StaticResource FooterText}" Margin="0,0,0,6" />
+                                <Grid x:Name="SubmissionGrid">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="80" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="60" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Text="File:" Style="{StaticResource FieldLabel}" />
+                                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="SubmissionFileText" Style="{StaticResource ValueText}" />
+                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="Score:" Style="{StaticResource FieldLabel}" />
+                                    <TextBlock Grid.Row="0" Grid.Column="3" x:Name="ScoreText" Style="{StaticResource ValueText}" FontSize="15" FontWeight="SemiBold" />
+                                    <TextBlock Grid.Row="1" Text="Submitted:" Style="{StaticResource FieldLabel}" />
+                                    <TextBlock Grid.Row="1" Grid.Column="1" x:Name="SubmittedText" Style="{StaticResource ValueText}" />
+                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="Late:" Style="{StaticResource FieldLabel}" />
+                                    <TextBlock Grid.Row="1" Grid.Column="3" x:Name="LateText" Style="{StaticResource ValueText}" />
+                                </Grid>
+                                <GroupBox Header="Teacher comment" Margin="0,4,0,8">
+                                    <TextBox x:Name="CommentBox" Style="{StaticResource ReadOnlyTextBox}" MaxHeight="220" />
+                                </GroupBox>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button x:Name="DownloadSubmissionButton" Content="Download my submission" Style="{StaticResource ToolbarButton}"
+                                            Click="DownloadSubmission_Click" />
+                                    <Button x:Name="SubmitButton" Content="Submit…" Style="{StaticResource ToolbarButton}" Click="Submit_Click" />
+                                </StackPanel>
+                                <TextBlock x:Name="SubmitInfo" Style="{StaticResource InfoText}" Visibility="Collapsed" />
+                            </StackPanel>
+                        </GroupBox>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+        </Grid>
+
+        <!-- Status bar -->
+        <DockPanel Grid.Row="3" Margin="0,6,0,0">
+            <TextBlock DockPanel.Dock="Right" x:Name="OpenFolderLink" Visibility="Collapsed" VerticalAlignment="Center">
+                <Hyperlink Click="OpenFolder_Click">Open folder</Hyperlink>
+            </TextBlock>
+            <TextBlock x:Name="StatusText" Text="Ready" Foreground="{StaticResource StatusMutedBrush}" TextTrimming="CharacterEllipsis" />
+        </DockPanel>
+    </Grid>
+</Window>

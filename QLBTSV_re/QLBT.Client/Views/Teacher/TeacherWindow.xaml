@@ -1,0 +1,223 @@
+<Window x:Class="QLBT.Client.Views.Teacher.TeacherWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="QLBT – Teacher" Width="1280" Height="800" MinWidth="1000" MinHeight="650"
+        WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" Closed="Window_Closed" PreviewKeyDown="Window_PreviewKeyDown">
+    <Grid Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Header bar -->
+        <DockPanel Grid.Row="0" Margin="0,0,0,8">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <Button Content="Profile" Style="{StaticResource ToolbarButton}" Click="Profile_Click" />
+                <Button Content="⟳ Refresh" Style="{StaticResource ToolbarButton}" ToolTip="Reload (F5)" Click="Refresh_Click" />
+                <Button Content="Logout" Style="{StaticResource ToolbarButton}" Margin="0" Click="Logout_Click" />
+            </StackPanel>
+            <TextBlock x:Name="UserText" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center" />
+        </DockPanel>
+
+        <Grid Grid.Row="1" x:Name="Root">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Classes: class code only; details in the Class info dialog -->
+            <DockPanel Grid.Column="0" Margin="0,0,8,0">
+                <TextBlock DockPanel.Dock="Top" Text="Classes" Style="{StaticResource EditorTitle}" Margin="0,0,0,6" />
+                <ComboBox DockPanel.Dock="Top" x:Name="SemesterBox" Margin="0,0,0,6" ToolTip="Semester"
+                          SelectionChanged="SemesterBox_SelectionChanged" />
+                <Button DockPanel.Dock="Bottom" x:Name="ClassInfoButton" Content="Class info…" Margin="0,6,0,0" Padding="6,3"
+                        ToolTipService.ShowOnDisabled="True" ToolTip="Course, semester and students of the class (or double-click)"
+                        Click="ClassInfo_Click" />
+                <Grid>
+                    <ListBox x:Name="ClassList" DisplayMemberPath="Display" SelectionChanged="ClassList_SelectionChanged"
+                             MouseDoubleClick="ClassList_MouseDoubleClick" BorderBrush="{StaticResource EditorBorderBrush}">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="ToolTip" Value="{Binding ToolTip}" />
+                                <Setter Property="Padding" Value="6,4" />
+                                <Setter Property="FontWeight" Value="SemiBold" />
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
+                    <TextBlock x:Name="ClassEmptyText" Style="{StaticResource EmptyText}" Text="No classes." TextWrapping="Wrap"
+                               Visibility="Collapsed" />
+                </Grid>
+            </DockPanel>
+
+            <!-- Assignments + submissions of the selected class -->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" MinHeight="110" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" MinHeight="150" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" x:Name="ClassHeaderText" Style="{StaticResource EditorTitle}" Margin="0,0,0,6"
+                           Text="Select a class" />
+
+                <!-- Assignment editor -->
+                <GroupBox Grid.Row="1" x:Name="EditorGroup" Style="{StaticResource EditorPanel}">
+                    <GroupBox.Header>
+                        <TextBlock x:Name="EditorTitle" Style="{StaticResource EditorTitle}" Text="New assignment" />
+                    </GroupBox.Header>
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="90" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="60" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Text="Title:" Style="{StaticResource FieldLabel}" />
+                            <TextBox Grid.Row="0" Grid.Column="1" x:Name="TitleBox" MaxLength="255" Style="{StaticResource FieldBox}"
+                                     TextChanged="Field_Changed" />
+                            <TextBlock Grid.Row="0" Grid.Column="2" Text="Due:" Style="{StaticResource FieldLabel}" />
+                            <StackPanel Grid.Row="0" Grid.Column="3" Orientation="Horizontal">
+                                <DatePicker x:Name="DueDatePicker" Width="120" Style="{StaticResource FieldBox}" Margin="0,0,6,6"
+                                            SelectedDateFormat="Short" SelectedDateChanged="Field_Changed" />
+                                <TextBox x:Name="DueTimeBox" Width="55" MaxLength="5" Style="{StaticResource FieldBox}" Margin="0,0,0,6"
+                                         ToolTip="Time (HH:mm)" TextChanged="Field_Changed" />
+                            </StackPanel>
+
+                            <TextBlock Grid.Row="1" Text="Description:" Style="{StaticResource FieldLabel}" VerticalAlignment="Top" Margin="0,3,8,6" />
+                            <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" x:Name="DescriptionBox" Height="52" AcceptsReturn="True"
+                                     TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Margin="0,0,0,6" TextChanged="Field_Changed" />
+
+                            <StackPanel Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Orientation="Horizontal" Margin="0,0,0,6">
+                                <CheckBox x:Name="AllowLateBox" Content="Allow late submissions" VerticalAlignment="Center" Margin="0,0,20,0"
+                                          Checked="Field_Changed" Unchecked="Field_Changed" />
+                                <CheckBox x:Name="ClosedBox" Content="Closed manually" VerticalAlignment="Center" Margin="0,0,20,0"
+                                          ToolTipService.ShowOnDisabled="True"
+                                          ToolTip="Close to stop submissions and allow grading; untick to reopen"
+                                          Checked="Field_Changed" Unchecked="Field_Changed" />
+                                <TextBlock Text="Status:" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                <TextBlock x:Name="StatusValueText" VerticalAlignment="Center" FontWeight="SemiBold" />
+                            </StackPanel>
+
+                            <TextBlock Grid.Row="3" Text="File:" Style="{StaticResource FieldLabel}" />
+                            <StackPanel Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3" Orientation="Horizontal" Margin="0,0,0,6">
+                                <TextBlock x:Name="FileText" VerticalAlignment="Center" Margin="0,0,12,0" MaxWidth="360"
+                                           TextTrimming="CharacterEllipsis" />
+                                <Button x:Name="ChooseFileButton" Content="Choose file…" Style="{StaticResource ToolbarButton}"
+                                        Click="ChooseFile_Click" />
+                                <Button x:Name="DownloadFileButton" Content="Download" Style="{StaticResource ToolbarButton}"
+                                        Click="DownloadFile_Click" />
+                            </StackPanel>
+                        </Grid>
+
+                        <TextBlock x:Name="InfoText" Style="{StaticResource InfoText}" Visibility="Collapsed" />
+                        <TextBlock x:Name="ErrorText" Style="{StaticResource ErrorText}" Visibility="Collapsed" />
+
+                        <DockPanel Margin="0,4,0,0">
+                            <Button x:Name="DeleteButton" DockPanel.Dock="Right" Content="Delete" Style="{StaticResource ToolbarButton}" Margin="0"
+                                    Click="Delete_Click" />
+                            <Button x:Name="NewButton" DockPanel.Dock="Right" Content="+ New" Style="{StaticResource ToolbarButton}"
+                                    ToolTip="New assignment (Ctrl+N)" Click="New_Click" />
+                            <TextBlock x:Name="DirtyText" DockPanel.Dock="Right" Text="● Unsaved changes" Margin="0,0,12,0"
+                                       VerticalAlignment="Center" Foreground="{StaticResource StatusWarnBrush}" Visibility="Collapsed" />
+                            <StackPanel Orientation="Horizontal">
+                                <Button x:Name="SaveButton" Content="Save" Style="{StaticResource ToolbarButton}" ToolTip="Save (Ctrl+S)"
+                                        Click="Save_Click" />
+                                <Button x:Name="CancelButton" Content="Cancel" Style="{StaticResource ToolbarButton}" Click="Cancel_Click" />
+                            </StackPanel>
+                        </DockPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- Assignments -->
+                <Grid Grid.Row="2">
+                    <DataGrid x:Name="AssignmentsGrid" SelectionChanged="AssignmentsGrid_SelectionChanged">
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsClosed}" Value="True">
+                                        <Setter Property="Foreground" Value="{StaticResource StatusMutedBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="2*" />
+                            <DataGridTextColumn Header="Due" Binding="{Binding DueText}" Width="120" SortMemberPath="DueDate" />
+                            <DataGridTextColumn Header="Status" Binding="{Binding StatusText}" Width="110" />
+                            <DataGridTextColumn Header="Submitted" Binding="{Binding SubmittedText}" Width="80" />
+                            <DataGridTextColumn Header="Graded" Binding="{Binding GradedCount}" Width="60" />
+                            <DataGridTextColumn Header="File" Binding="{Binding FileText}" Width="*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <TextBlock x:Name="AssignmentsEmptyText" Style="{StaticResource EmptyText}" Visibility="Collapsed" />
+                </Grid>
+
+                <GridSplitter Grid.Row="3" Height="6" HorizontalAlignment="Stretch" Margin="0,4" Background="#E0E6EE"
+                              ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" ToolTip="Drag to resize" />
+
+                <!-- Submissions of the selected assignment -->
+                <Grid Grid.Row="4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <DockPanel Grid.Row="0" Margin="0,2,0,6">
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                            <Button x:Name="DownloadSubmissionButton" Content="Download" Style="{StaticResource ToolbarButton}"
+                                    ToolTip="Download the selected submission (or double-click)" Click="DownloadSubmission_Click" />
+                            <Button x:Name="GradeButton" Content="Grade…" Style="{StaticResource ToolbarButton}" Click="Grade_Click" />
+                            <Button x:Name="DeleteSubmissionButton" Content="Delete submission" Style="{StaticResource ToolbarButton}" Margin="0"
+                                    ToolTip="Delete the submission and its score so the student can submit again"
+                                    Click="DeleteSubmission_Click" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock x:Name="SubmissionsTitle" Style="{StaticResource EditorTitle}" Text="Submissions" Margin="0,0,16,0" />
+                            <CheckBox x:Name="UngradedOnlyBox" Content="Ungraded only" VerticalAlignment="Center"
+                                      Checked="UngradedOnly_Changed" Unchecked="UngradedOnly_Changed" />
+                        </StackPanel>
+                    </DockPanel>
+                    <DataGrid Grid.Row="1" x:Name="SubmissionsGrid" SelectionChanged="SubmissionsGrid_SelectionChanged"
+                              MouseDoubleClick="SubmissionsGrid_MouseDoubleClick">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Student" Binding="{Binding StudentUsername}" Width="100" />
+                            <DataGridTextColumn Header="Name" Binding="{Binding StudentName}" Width="2*" />
+                            <DataGridTextColumn Header="Submitted" Binding="{Binding SubmittedText}" Width="120" SortMemberPath="SubmittedAt" />
+                            <DataGridTextColumn Header="Late" Binding="{Binding LateText}" Width="50">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="{StaticResource StatusWarnBrush}" />
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="#" Binding="{Binding SubmitCount}" Width="35" />
+                            <DataGridTextColumn Header="Score" Binding="{Binding ScoreText}" Width="60" />
+                            <DataGridTextColumn Header="File" Binding="{Binding FileName}" Width="*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <TextBlock Grid.Row="1" x:Name="SubmissionsEmptyText" Style="{StaticResource EmptyText}" />
+                    <TextBlock Grid.Row="2" x:Name="SubmissionsFooter" Style="{StaticResource FooterText}" />
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <!-- Status bar -->
+        <DockPanel Grid.Row="2" Margin="0,6,0,0">
+            <TextBlock DockPanel.Dock="Right" x:Name="OpenFolderLink" Visibility="Collapsed" VerticalAlignment="Center">
+                <Hyperlink Click="OpenFolder_Click">Open folder</Hyperlink>
+            </TextBlock>
+            <TextBlock x:Name="StatusText" Text="Ready" Foreground="{StaticResource StatusMutedBrush}" TextTrimming="CharacterEllipsis" />
+        </DockPanel>
+    </Grid>
+</Window>
