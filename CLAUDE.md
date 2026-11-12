@@ -31,10 +31,15 @@ QLBTSV_re/             Main solution (QLBTSV_re.sln)
     Files/             FileStorage (id-based paths), FileReceiver (streamed upload to .tmp)
     Models/            Scaffolded EF entities (never hand-edit)
     Views/             Admin tabs (UsersView, SemestersView, CoursesView, ClassesView: editor on top, list below) + AddStudentsDialog
-  QLBT.Client          WPF (not created yet): separate Teacher and Student UIs, talks to the server only over HTTP
+  QLBT.Client          WPF: login, then a Teacher or Student window; talks to the server only over HTTP
+    Api/               ApiClient (HTTP wrapper ported from Svr3.Client), QlbtApi (one call per operation), Session
+    Views/             LoginWindow, ProfileDialog; Teacher/ (TeacherWindow 3-pane, ClassInfoDialog, GradeDialog);
+                       Student/ (StudentWindow: tree by class or list by due date + detail)
+    appsettings.json   { "ServerUrl": ... } (Copy Always); read by ClientSettings, no UI to change it
+    UiHelper.cs        Check(ApiResult) (Unauthorized → login), file dialogs, BusyScope
 ```
 
-Create missing projects by following `docs/ProjectCreation.md` (net8.0, with the package versions listed there). The Client's HTTP wrapper can be ported from `Prototype/ServerVersion3_ASP/Svr3.Client/ApiClient.cs`.
+Create missing projects by following `docs/ProjectCreation.md` (net8.0, with the package versions listed there).
 
 ## Build and run
 
@@ -62,6 +67,7 @@ Create missing projects by following `docs/ProjectCreation.md` (net8.0, with the
 - **Users:** username and role are fixed after creation; a user with any class (taught or enrolled) cannot be deleted, suspend them in the class instead. Suspension (per class) can be toggled at any time: `is_active = 0, left_at = now` and back.
 - **Courses:** a class = group name + course + semester (`uq_classes` = name, semester_id, course_id); there is no major column. Teacher, course and name can change before the semester starts. A course used by a class cannot be deleted.
 - **One class per course per semester:** a student may be active in only one class of a course in a semester (suspended enrolments do not count). The DB enforces it: `class_students` copies `semester_id` / `course_id` from the class (composite FK, `ON UPDATE CASCADE`) and has the filtered unique index `uq_class_students_course`. `ClassAdminService` checks first for a readable message (add students, un-suspend, change course) and the picker hides students who would break it. Always set `SemesterId` / `CourseId` when inserting a `ClassStudent`.
+- **Client:** code-behind like the server views; every call goes through `QlbtApi` and every result through `UiHelper.Check` (shows the server's `error`; `Unauthorized` → `App.SessionExpired()` → login window). `ApiClient` never throws on network errors: they come back as `Error` "Cannot reach server". Buttons mirror the server rules (grade only when closed, no submit when closed / suspended / graded) but the server stays the authority. Downloads use a Save dialog with the name from `Content-Disposition`.
 - **Changing a class's course:** EF treats `(Id, SemesterId, CourseId)` on `Class` as an alternate key and refuses to modify `CourseId`; update it with SQL (`ExecuteSqlInterpolatedAsync`), the DB cascades it to `class_students`.
 - **SQL scripts:** both start with `SET QUOTED_IDENTIFIER ON` (required by the filtered index; sqlcmd defaults to OFF).
 

@@ -49,6 +49,12 @@ Quản lý bằng GUI ngay trên máy chủ (thao tác trực tiếp với CSDL,
 
 Chia ra UI cho sv và gv riêng.
 
+- Địa chỉ server đặt trong `appsettings.json` của client (`ServerUrl`), không sửa trên giao diện
+- Đăng nhập → mở cửa sổ theo vai trò; phiên hết hạn (`Unauthorized`) → quay về màn hình đăng nhập
+- Tải file về: hộp thoại lưu file, tên gốc lấy từ server
+- Gv: 3 vùng — cột trái chỉ có mã lớp (lọc theo kì, nút "Class info…" mở hộp thoại thông tin lớp + DS sv); bên phải là vùng sửa bài tập ở trên, DS bài tập, DS bài nộp ở dưới; chấm điểm trong hộp thoại riêng
+- Sv: DS bài tập dạng cây theo lớp hoặc danh sách theo hạn; bên phải là thông tin bài tập và bài nộp của mình (mô tả, nhận xét gv nằm trong ô văn bản riêng)
+
 ### Giáo viên
 
 - Lấy DS lớp đang đứng

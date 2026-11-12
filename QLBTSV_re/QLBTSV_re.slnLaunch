@@ -1,0 +1,17 @@
+[
+  {
+    "Name": "Run client and server",
+    "Projects": [
+      {
+        "Path": "QLBT.Server\\QLBT.Server.csproj",
+        "Action": "Start",
+        "DebugTarget": "QLBT.Server"
+      },
+      {
+        "Path": "QLBT.Client\\QLBT.Client.csproj",
+        "Action": "Start",
+        "DebugTarget": "QLBT.Client"
+      }
+    ]
+  }
+]
