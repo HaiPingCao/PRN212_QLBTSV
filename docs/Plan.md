@@ -15,19 +15,18 @@ Quản lý bằng GUI ngay trên máy chủ (thao tác trực tiếp với CSDL,
   - Sửa mã / tên lúc nào cũng được (lớp tham chiếu theo id)
   - Xóa chỉ khi chưa có lớp nào dùng môn đó
 - Lớp = nhóm lớp + môn + kì (vd. SE1802 · PRN212 · FA26)
-  - Thêm mới (chỉ vào kì chưa bắt đầu); 1 nhóm lớp chỉ có 1 lớp cho mỗi môn trong 1 kì
-  - Xóa, sửa (tên, môn, gv) nếu kì chưa bắt đầu (xóa lớp xóa luôn bài tập, bài nộp và thư mục file của lớp)
-  - Thêm sinh viên vào lớp (chỉ khi kì chưa bắt đầu; sv lỡ đăng ký thì không được thêm)
+  - Thêm mới; 1 nhóm lớp chỉ có 1 lớp cho mỗi môn trong 1 kì
+  - Xóa, sửa (tên, môn, gv) lúc nào cũng được (xóa lớp xóa luôn bài tập, bài nộp và thư mục file của lớp)
+  - Thêm sinh viên vào lớp
   - Mỗi sv chỉ học 1 lớp / môn / kì (tính lớp đang tham gia, lớp bị đình chỉ coi như đã rời)
     - CSDL bảo đảm: `class_students` lưu bản sao `semester_id`, `course_id` (khóa ngoại kép tới lớp) + chỉ mục unique có lọc `(student_id, semester_id, course_id) WHERE is_active = 1`
     - Server kiểm tra trước để báo lỗi rõ ràng khi thêm sv, bỏ đình chỉ và đổi môn của lớp
-  - Gỡ sv khỏi lớp: chỉ khi kì chưa bắt đầu và sv chưa có bài nộp
+  - Gỡ sv khỏi lớp: chỉ khi sv chưa có bài nộp (đã có bài nộp thì đình chỉ)
   - Đánh dấu đình chỉ sv (theo từng lớp, coi như xóa); bỏ đình chỉ được, lúc nào cũng được
   - Không bao giờ đổi kì học của lớp
 - Kì học
   - Thêm mới
-  - Xóa, sửa nếu kì chưa bắt đầu; xóa chỉ khi kì không còn lớp nào
-  - Đã bắt đầu: khóa ngày bắt đầu, ngày kết thúc chỉ được lùi về sau
+  - Sửa lúc nào cũng được; xóa chỉ khi kì không còn lớp nào
 - Giao diện: các tab Users, Semesters, Courses, Classes; mỗi tab có vùng sửa ở trên, danh sách ở dưới; tab Lớp có thêm danh sách sv của lớp đang chọn
 - File lưu trữ
   - Thư mục đặt theo ID, không theo tên (đổi tên trong CSDL không làm mất file):
@@ -159,7 +158,7 @@ Mỗi request 1 kết nối TCP. Khung dữ liệu: `int` độ dài JSON → JS
 - Server xác định vai trò và quyền từ SessionId, không tin dữ liệu client gửi
 - `Unauthorized` → client xóa SessionId, quay về màn hình đăng nhập
 - `Forbidden` → đã đăng nhập nhưng không có quyền (sai vai trò, không phải chủ sở hữu, bị đình chỉ)
-- `Rejected` → có quyền nhưng vi phạm quy tắc (bài tập đã đóng, bài nộp đã chấm, kì đã bắt đầu)
+- `Rejected` → có quyền nhưng vi phạm quy tắc (bài tập đã đóng, bài nộp đã chấm)
 - Logout: client luôn xóa SessionId, kể cả khi server không phản hồi
 - Mật khẩu lưu dạng hash trên server (BCrypt)
 

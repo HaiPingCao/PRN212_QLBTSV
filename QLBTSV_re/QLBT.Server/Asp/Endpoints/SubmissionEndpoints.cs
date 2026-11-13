@@ -25,7 +25,7 @@ public static class SubmissionEndpoints
             .FirstOrDefaultAsync(s => s.Id == id);
         if (submission == null)
         {
-            return ApiResults.Fail(ApiStatus.NotFound, "Submission not found.");
+            return ApiResults.Fail(ApiStatus.NotFound, "The submission could not be found.");
         }
 
         int userId = user.GetUserId();
@@ -40,7 +40,7 @@ public static class SubmissionEndpoints
         }
         if (!allowed)
         {
-            return ApiResults.Fail(ApiStatus.Forbidden, "This submission is not yours.");
+            return ApiResults.Fail(ApiStatus.Forbidden, "You do not have permission to access this submission.");
         }
 
         string path = storage.SubmissionFile(submission.Assignment.Class.SemesterId, submission.ClassId, submission.AssignmentId, submission.Id);

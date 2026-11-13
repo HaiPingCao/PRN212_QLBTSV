@@ -21,17 +21,17 @@ public static class AuthEndpoints
     {
         if (string.IsNullOrWhiteSpace(request.Username) || string.IsNullOrEmpty(request.Password))
         {
-            return ApiResults.Fail(ApiStatus.InvalidCredentials, "Username and password are required.");
+            return ApiResults.Fail(ApiStatus.InvalidCredentials, "Please enter your username and password.");
         }
 
         User? user = await db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Username == request.Username);
         if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
         {
-            return ApiResults.Fail(ApiStatus.InvalidCredentials, "Wrong username or password.");
+            return ApiResults.Fail(ApiStatus.InvalidCredentials, "The username or password is incorrect.");
         }
         if (!Enum.IsDefined(typeof(UserRole), user.RoleId))
         {
-            return ApiResults.Fail(ApiStatus.Forbidden, "Account has no client role.");
+            return ApiResults.Fail(ApiStatus.Forbidden, "This account is not permitted to use the client application.");
         }
 
         UserRole role = (UserRole)user.RoleId;
@@ -51,7 +51,7 @@ public static class AuthEndpoints
         User? user = await db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId);
         if (user == null)
         {
-            return ApiResults.Fail(ApiStatus.NotFound, "User no longer exists.");
+            return ApiResults.Fail(ApiStatus.NotFound, "The user account no longer exists.");
         }
         return Results.Ok(ToDto(user));
     }

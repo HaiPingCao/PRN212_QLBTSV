@@ -58,13 +58,13 @@ public sealed class SessionAuthenticationHandler : AuthenticationHandler<Authent
     /// <summary>401: not logged in or session gone. Client clears its SessionId.</summary>
     protected override Task HandleChallengeAsync(AuthenticationProperties properties)
     {
-        return WriteError(StatusCodes.Status401Unauthorized, ApiStatus.Unauthorized, "Not logged in or session expired.");
+        return WriteError(StatusCodes.Status401Unauthorized, ApiStatus.Unauthorized, "You are not logged in, or your session has expired.");
     }
 
     /// <summary>403: logged in but wrong role.</summary>
     protected override Task HandleForbiddenAsync(AuthenticationProperties properties)
     {
-        return WriteError(StatusCodes.Status403Forbidden, ApiStatus.Forbidden, "This operation is not allowed for your role.");
+        return WriteError(StatusCodes.Status403Forbidden, ApiStatus.Forbidden, "Your role does not permit this operation.");
     }
 
     private Task WriteError(int statusCode, ApiStatus status, string error)

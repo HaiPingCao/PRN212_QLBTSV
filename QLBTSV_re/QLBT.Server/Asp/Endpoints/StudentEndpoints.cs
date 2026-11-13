@@ -43,7 +43,7 @@ public static class StudentEndpoints
             .FirstOrDefaultAsync();
         if (submission == null)
         {
-            return ApiResults.Fail(ApiStatus.NotFound, "You have not submitted this assignment.");
+            return ApiResults.Fail(ApiStatus.NotFound, "You have not yet submitted this assignment.");
         }
         return Results.Ok(submission);
     }
@@ -78,7 +78,7 @@ public static class StudentEndpoints
         Assignment? assignment = await db.Assignments.AsNoTracking().Include(a => a.Class).FirstOrDefaultAsync(a => a.Id == id);
         if (assignment == null)
         {
-            return ApiResults.Fail(ApiStatus.NotFound, "Assignment not found.");
+            return ApiResults.Fail(ApiStatus.NotFound, "The assignment could not be found.");
         }
 
         IResult? denied = await CheckActiveMember(db, assignment.ClassId, user.GetUserId());
@@ -88,7 +88,7 @@ public static class StudentEndpoints
         }
         if (assignment.FileName == null)
         {
-            return ApiResults.Fail(ApiStatus.NotFound, "This assignment has no file.");
+            return ApiResults.Fail(ApiStatus.NotFound, "This assignment does not have an attached file.");
         }
 
         string path = storage.AssignmentFile(assignment.Class.SemesterId, assignment.ClassId, assignment.Id);
@@ -111,14 +111,14 @@ public static class StudentEndpoints
         string? cleanName = FileReceiver.CleanFileName(fileName);
         if (cleanName == null)
         {
-            return ApiResults.Fail(ApiStatus.Rejected, "Missing or invalid file name.");
+            return ApiResults.Fail(ApiStatus.Rejected, "The file name is missing or invalid.");
         }
 
         int studentId = user.GetUserId();
         Assignment? assignment = await db.Assignments.AsNoTracking().Include(a => a.Class).FirstOrDefaultAsync(a => a.Id == id, ct);
         if (assignment == null)
         {
-            return ApiResults.Fail(ApiStatus.NotFound, "Assignment not found.");
+            return ApiResults.Fail(ApiStatus.NotFound, "The assignment could not be found.");
         }
 
         IResult? denied = await CheckActiveMember(db, assignment.ClassId, studentId);
@@ -130,13 +130,13 @@ public static class StudentEndpoints
         DateTime now = DateTime.Now;
         if (AssignmentRules.IsClosed(assignment, now))
         {
-            return ApiResults.Fail(ApiStatus.Rejected, "Assignment is closed.");
+            return ApiResults.Fail(ApiStatus.Rejected, "This assignment is closed and no longer accepts submissions.");
         }
 
         Submission? submission = await db.Submissions.FirstOrDefaultAsync(s => s.AssignmentId == id && s.StudentId == studentId, ct);
         if (submission != null && submission.Score != null)
         {
-            return ApiResults.Fail(ApiStatus.Rejected, "Submission is already graded.");
+            return ApiResults.Fail(ApiStatus.Rejected, "Your submission has already been graded and can no longer be replaced.");
         }
 
         int semesterId = assignment.Class.SemesterId;
@@ -197,11 +197,11 @@ public static class StudentEndpoints
             .FirstOrDefaultAsync(cs => cs.ClassId == classId && cs.StudentId == studentId);
         if (member == null)
         {
-            return ApiResults.Fail(ApiStatus.Forbidden, "You are not in this class.");
+            return ApiResults.Fail(ApiStatus.Forbidden, "You are not enrolled in this class.");
         }
         if (!member.IsActive)
         {
-            return ApiResults.Fail(ApiStatus.Forbidden, "You are suspended in this class.");
+            return ApiResults.Fail(ApiStatus.Forbidden, "Your enrolment in this class has been suspended.");
         }
         return null;
     }

@@ -1,0 +1,177 @@
+<mxfile host="drawio">
+  <diagram id="structure" name="Project structure">
+    <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1500" pageHeight="920" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="title" parent="1" vertex="1" style="text;html=1;fontSize=20;fontStyle=1;align=left;verticalAlign=middle;" value="QLBTSV – project structure (QLBTSV_re.sln)">
+          <mxGeometry x="20" y="0" width="560" height="26" as="geometry"/>
+        </mxCell>
+
+        <!-- ============ Containers ============ -->
+        <mxCell id="client" parent="1" vertex="1" style="swimlane;html=1;startSize=30;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=14;rounded=1;arcSize=2;" value="QLBT.Client (WPF, talks to the server only over HTTP)">
+          <mxGeometry x="20" y="60" width="360" height="650" as="geometry"/>
+        </mxCell>
+        <mxCell id="shared" parent="1" vertex="1" style="swimlane;html=1;startSize=30;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=14;rounded=1;arcSize=4;" value="QLBT.Shared (classlib)">
+          <mxGeometry x="420" y="60" width="260" height="150" as="geometry"/>
+        </mxCell>
+        <mxCell id="server" parent="1" vertex="1" style="swimlane;html=1;startSize=30;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=14;rounded=1;arcSize=2;" value="QLBT.Server (WPF admin GUI + in-process ASP.NET Core API)">
+          <mxGeometry x="720" y="60" width="700" height="650" as="geometry"/>
+        </mxCell>
+
+        <!-- ============ Shared ============ -->
+        <mxCell id="sh_files" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;spacingLeft=8;fillColor=#ffffff;strokeColor=#d6b656;" value="&lt;b&gt;ApiRoutes.cs&lt;/b&gt; route constants, ApiJson&lt;br&gt;&lt;b&gt;ApiStatus.cs&lt;/b&gt; Ok / Unauthorized / Forbidden / ...&lt;br&gt;&lt;b&gt;DTOs.cs&lt;/b&gt; request / response DTOs">
+          <mxGeometry x="435" y="100" width="230" height="95" as="geometry"/>
+        </mxCell>
+
+        <!-- ============ Client ============ -->
+        <mxCell id="c_views" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;fillColor=#ffffff;strokeColor=#6c8ebf;" value="&lt;b&gt;Views/&lt;/b&gt;&lt;br&gt;LoginWindow · ProfileDialog&lt;br&gt;&lt;b&gt;Teacher/&lt;/b&gt;&lt;br&gt;&amp;nbsp; TeacherWindow (classes · assignments · submissions)&lt;br&gt;&amp;nbsp; ClassInfoDialog · GradeDialog · TeacherRows&lt;br&gt;&lt;b&gt;Student/&lt;/b&gt;&lt;br&gt;&amp;nbsp; StudentWindow (tree by class / list by due + detail)&lt;br&gt;&amp;nbsp; StudentRows">
+          <mxGeometry x="40" y="100" width="320" height="150" as="geometry"/>
+        </mxCell>
+        <mxCell id="c_app" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;spacingLeft=8;fillColor=#ffffff;strokeColor=#6c8ebf;" value="&lt;b&gt;App.xaml(.cs)&lt;/b&gt; styles, navigation:&lt;br&gt;Login → Teacher / Student window;&lt;br&gt;Logout / SessionExpired → Login">
+          <mxGeometry x="40" y="270" width="320" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="c_ui" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;spacingLeft=8;fillColor=#ffffff;strokeColor=#6c8ebf;" value="&lt;b&gt;UiHelper.cs&lt;/b&gt; Check(ApiResult) (Unauthorized → login),&lt;br&gt;file dialogs, BusyScope, formats">
+          <mxGeometry x="40" y="360" width="320" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="c_api" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;fillColor=#ffffff;strokeColor=#6c8ebf;" value="&lt;b&gt;Api/&lt;/b&gt;&lt;br&gt;&lt;b&gt;QlbtApi&lt;/b&gt; one call per operation&lt;br&gt;&lt;b&gt;ApiClient&lt;/b&gt; HttpClient, Bearer sessionId,&lt;br&gt;&amp;nbsp; JSON, upload / download, never throws&lt;br&gt;&lt;b&gt;Session&lt;/b&gt; current user + ApiClient">
+          <mxGeometry x="40" y="440" width="320" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="c_settings" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;spacingLeft=8;fillColor=#ffffff;strokeColor=#6c8ebf;" value="&lt;b&gt;ClientSettings.cs&lt;/b&gt; + &lt;b&gt;appsettings.json&lt;/b&gt;&lt;br&gt;{ &quot;ServerUrl&quot;: ... } (no UI to change it)">
+          <mxGeometry x="40" y="620" width="320" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- ============ Server: admin GUI (left column) ============ -->
+        <mxCell id="s_main" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;spacingLeft=8;fillColor=#ffffff;strokeColor=#82b366;" value="&lt;b&gt;MainWindow.xaml&lt;/b&gt; tabs: Users · Semesters · Courses ·&lt;br&gt;Classes · Server configuration · Server log">
+          <mxGeometry x="740" y="100" width="320" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="s_views" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;fillColor=#ffffff;strokeColor=#82b366;" value="&lt;b&gt;Views/&lt;/b&gt; (admin tabs, code-behind)&lt;br&gt;UsersView · SemestersView · CoursesView&lt;br&gt;ClassesView · AddStudentsDialog&lt;br&gt;ViewHelper (messages, DB error dialog)">
+          <mxGeometry x="740" y="180" width="320" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="s_admin" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;fillColor=#ffffff;strokeColor=#82b366;" value="&lt;b&gt;Admin/&lt;/b&gt; (DB work + rule checks → AdminResult)&lt;br&gt;UserAdminService · SemesterAdminService&lt;br&gt;CourseAdminService · ClassAdminService&lt;br&gt;AdminLog (→ Server log tab) · Rows.cs (grid rows)">
+          <mxGeometry x="740" y="300" width="320" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="s_dbf" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;spacingLeft=8;fillColor=#ffffff;strokeColor=#82b366;" value="&lt;b&gt;DAO/&lt;/b&gt; UserDAO, SemesterDAO, CourseDAO, ClassDAO: every admin query;&lt;br&gt;DbFactory.Create(): new context per call, from appsettings.json">
+          <mxGeometry x="740" y="420" width="320" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- ============ Server: HTTP API (right column) ============ -->
+        <mxCell id="s_asp" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;fillColor=#ffffff;strokeColor=#82b366;" value="&lt;b&gt;Asp/&lt;/b&gt;&lt;br&gt;ServerHost (DI, Kestrel, AddDbContext)&lt;br&gt;ServerRunner (Start / Stop) · ServerSettings&lt;br&gt;UiLoggerProvider (→ Server log tab)">
+          <mxGeometry x="1090" y="100" width="310" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="s_end" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;fillColor=#ffffff;strokeColor=#82b366;" value="&lt;b&gt;Asp/Endpoints/&lt;/b&gt; (Minimal API)&lt;br&gt;AuthEndpoints · TeacherEndpoints&lt;br&gt;StudentEndpoints · SubmissionEndpoints&lt;br&gt;ApiResults (ApiError body)">
+          <mxGeometry x="1090" y="200" width="310" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="s_auth" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;fillColor=#ffffff;strokeColor=#82b366;" value="&lt;b&gt;Asp/SessionAndAuthentication/&lt;/b&gt;&lt;br&gt;SessionStore (in memory) · Session&lt;br&gt;SessionAuthenticationHandler (Bearer)&lt;br&gt;Policies · ClaimsPrincipalExtensions">
+          <mxGeometry x="1090" y="310" width="310" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="s_files" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;spacingLeft=8;fillColor=#ffffff;strokeColor=#82b366;" value="&lt;b&gt;Files/&lt;/b&gt; FileStorage (id-based paths)&lt;br&gt;FileReceiver (streamed upload → .tmp)">
+          <mxGeometry x="1090" y="420" width="310" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- ============ Server: shared by both halves ============ -->
+        <mxCell id="s_domain" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;spacingLeft=8;fillColor=#ffffff;strokeColor=#82b366;dashed=1;" value="&lt;b&gt;Domain/&lt;/b&gt; rules used by both endpoints and admin services: AssignmentRules (closed state, submit checks) · SemesterRules · AdminResult">
+          <mxGeometry x="740" y="510" width="660" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="s_models" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;spacingLeft=8;fillColor=#f5f5f5;strokeColor=#666666;" value="&lt;b&gt;Models/&lt;/b&gt; scaffolded EF Core (never hand-edit): &lt;b&gt;Prn212PQlbtContext&lt;/b&gt;&lt;br&gt;User · Role · Semester · Course · Class · ClassStudent · Assignment · Submission">
+          <mxGeometry x="740" y="590" width="660" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- ============ External ============ -->
+        <mxCell id="db" parent="1" vertex="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=12;fillColor=#e1d5e7;strokeColor=#9673a6;" value="&lt;b&gt;SQL Server&lt;/b&gt;&lt;br&gt;PRN212_P_QLBT&lt;br&gt;(db/QLBT.sql, QLBT_test_ds.sql)">
+          <mxGeometry x="880" y="760" width="220" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="storage" parent="1" vertex="1" style="shape=folder;whiteSpace=wrap;html=1;tabWidth=50;tabHeight=14;tabPosition=left;fillColor=#ffe6cc;strokeColor=#d79b00;" value="&lt;b&gt;storage/&lt;/b&gt; (StoragePath)&lt;br&gt;{sem}/{class}/{assignment}/assignment&lt;br&gt;.../submissions/{submissionId}">
+          <mxGeometry x="1160" y="760" width="230" height="100" as="geometry"/>
+        </mxCell>
+
+        <!-- ============ Edges ============ -->
+        <mxCell id="e_http" parent="1" edge="1" source="c_api" target="s_end" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;strokeColor=#b85450;exitX=1;exitY=0.5;entryX=1;entryY=0.6;" value="HTTP: JSON + Bearer sessionId&lt;br&gt;PUT upload / GET download">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="400" y="495"/>
+              <mxPoint x="400" y="40"/>
+              <mxPoint x="1460" y="40"/>
+              <mxPoint x="1460" y="254"/>
+            </Array>
+            <mxPoint x="930" y="40" as="offset"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_ref_c" parent="1" edge="1" source="client" target="shared" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;exitX=1;exitY=0.18;entryX=0;entryY=0.6;endArrow=open;" value="ref">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_ref_s" parent="1" edge="1" source="server" target="shared" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;exitX=0;exitY=0.18;entryX=1;entryY=0.6;endArrow=open;" value="ref">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e_cv_api" parent="1" edge="1" source="c_views" target="c_api" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0;exitY=0.6;entryX=0;entryY=0.5;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="30" y="190"/>
+              <mxPoint x="30" y="495"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_cset_api" parent="1" edge="1" source="c_settings" target="c_api" style="edgeStyle=orthogonalEdgeStyle;html=1;" value="ServerUrl">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e_main_run" parent="1" edge="1" source="s_main" target="s_asp" style="edgeStyle=orthogonalEdgeStyle;html=1;" value="Start / Stop">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_main_views" parent="1" edge="1" source="s_main" target="s_views" style="edgeStyle=orthogonalEdgeStyle;html=1;" value="">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_views_admin" parent="1" edge="1" source="s_views" target="s_admin" style="edgeStyle=orthogonalEdgeStyle;html=1;" value="">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_admin_dbf" parent="1" edge="1" source="s_admin" target="s_dbf" style="edgeStyle=orthogonalEdgeStyle;html=1;" value="">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_dbf_models" parent="1" edge="1" source="s_dbf" target="s_models" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0;exitY=0.5;entryX=0;entryY=0.5;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="730" y="450"/>
+              <mxPoint x="730" y="620"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="e_asp_end" parent="1" edge="1" source="s_asp" target="s_end" style="edgeStyle=orthogonalEdgeStyle;html=1;" value="">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_end_auth" parent="1" edge="1" source="s_end" target="s_auth" style="edgeStyle=orthogonalEdgeStyle;html=1;" value="">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_end_models" parent="1" edge="1" source="s_end" target="s_models" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.25;entryX=1;entryY=0.5;" value="DI context&lt;br&gt;per request">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1430" y="222"/>
+              <mxPoint x="1430" y="620"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="e_models_db" parent="1" edge="1" source="s_models" target="db" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeWidth=2;strokeColor=#9673a6;exitX=0.33;exitY=1;entryX=0.5;entryY=0;" value="EF Core">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_files_storage" parent="1" edge="1" source="s_files" target="storage" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeWidth=2;strokeColor=#d79b00;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1245" y="495"/>
+              <mxPoint x="1410" y="495"/>
+              <mxPoint x="1410" y="720"/>
+              <mxPoint x="1275" y="720"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ============ Legend ============ -->
+        <mxCell id="legend" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;fillColor=#ffffff;strokeColor=#999999;fontSize=11;" value="&lt;b&gt;Legend&lt;/b&gt;&lt;br&gt;red: HTTP over LAN&lt;br&gt;dashed: ProjectReference to QLBT.Shared&lt;br&gt;purple: database (EF Core)&lt;br&gt;orange: file storage&lt;br&gt;Admin GUI uses the DB directly, even when the HTTP server is stopped.">
+          <mxGeometry x="420" y="760" width="400" height="100" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

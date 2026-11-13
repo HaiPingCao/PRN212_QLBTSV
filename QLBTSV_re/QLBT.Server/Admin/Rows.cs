@@ -41,12 +41,7 @@ public sealed class SemesterRow
 
     public SemesterStatus Status
     {
-        get { return SemesterRules.Status(StartDate, EndDate, SemesterRules.Today()); }
-    }
-
-    public bool HasStarted
-    {
-        get { return Status != SemesterStatus.NotStarted; }
+        get { return SemesterRules.Status(StartDate, EndDate); }
     }
 
     public string StatusText
@@ -101,8 +96,6 @@ public sealed class ClassRow
 
     public string SemesterName { get; init; } = "";
 
-    public DateOnly SemesterStart { get; init; }
-
     public int TeacherId { get; init; }
 
     public string TeacherUsername { get; init; } = "";
@@ -112,11 +105,6 @@ public sealed class ClassRow
     public int ActiveCount { get; init; }
 
     public int TotalCount { get; init; }
-
-    public bool HasStarted
-    {
-        get { return SemesterRules.HasStarted(SemesterStart, SemesterRules.Today()); }
-    }
 
     public string TeacherDisplay
     {

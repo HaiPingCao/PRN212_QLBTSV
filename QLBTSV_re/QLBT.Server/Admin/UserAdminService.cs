@@ -1,5 +1,4 @@
-using Microsoft.EntityFrameworkCore;
-using QLBT.Server.Data;
+using QLBT.Server.DAO;
 using QLBT.Server.Domain;
 using QLBT.Server.Models;
 using QLBT.Shared;
@@ -11,23 +10,11 @@ public sealed class UserAdminService
 {
     public const int MinPasswordLength = 6;
 
-    public async Task<List<UserRow>> List()
+    private readonly UserDAO _users = new UserDAO();
+
+    public Task<List<UserRow>> List()
     {
-        using (Prn212PQlbtContext db = DbFactory.Create())
-        {
-            return await db.Users.AsNoTracking()
-                .OrderBy(u => u.RoleId).ThenBy(u => u.Username)
-                .Select(u => new UserRow
-                {
-                    Id = u.Id,
-                    Username = u.Username,
-                    FullName = u.FullName,
-                    Email = u.Email,
-                    Role = (UserRole)u.RoleId,
-                    ClassCount = u.Classes.Count + u.ClassStudents.Count
-                })
-                .ToListAsync();
-        }
+        return _users.List();
     }
 
     public async Task<AdminResult> Create(UserRole role, string username, string fullName, string email, string password)
@@ -41,31 +28,25 @@ public sealed class UserAdminService
         {
             return AdminResult.Fail(invalid);
         }
-
-        using (Prn212PQlbtContext db = DbFactory.Create())
+        if (await _users.UsernameExists(username))
         {
-            if (await db.Users.AnyAsync(u => u.Username == username))
-            {
-                return AdminResult.Fail("Username " + username + " is already used.");
-            }
-            if (await db.Users.AnyAsync(u => u.Email == email))
-            {
-                return AdminResult.Fail("Email " + email + " is already used.");
-            }
-
-            User user = new User
-            {
-                Username = username,
-                FullName = fullName,
-                Email = email,
-                RoleId = (int)role,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(password)
-            };
-            db.Users.Add(user);
-            await db.SaveChangesAsync();
-            AdminLog.Write("Created " + role + " " + username);
-            return AdminResult.Success(user.Id);
+            return AdminResult.Fail("The username " + username + " is already in use.");
         }
+        if (await _users.EmailExists(email, null))
+        {
+            return AdminResult.Fail("The email address " + email + " is already in use.");
+        }
+
+        int id = await _users.Insert(new User
+        {
+            Username = username,
+            FullName = fullName,
+            Email = email,
+            RoleId = (int)role,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(password)
+        });
+        AdminLog.Write("Created " + role + " " + username);
+        return AdminResult.Success(id);
     }
 
     /// <param name="newPassword">null or empty keeps the current password.</param>
@@ -80,67 +61,52 @@ public sealed class UserAdminService
         {
             return AdminResult.Fail(invalid);
         }
-
-        using (Prn212PQlbtContext db = DbFactory.Create())
+        User? user = await _users.GetById(id);
+        if (user == null)
         {
-            User? user = await db.Users.FirstOrDefaultAsync(u => u.Id == id);
-            if (user == null)
-            {
-                return AdminResult.Fail("User no longer exists.");
-            }
-            if (await db.Users.AnyAsync(u => u.Email == email && u.Id != id))
-            {
-                return AdminResult.Fail("Email " + email + " is already used.");
-            }
-
-            user.FullName = fullName;
-            user.Email = email;
-            if (resetPassword)
-            {
-                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
-            }
-            await db.SaveChangesAsync();
-            AdminLog.Write("Updated user " + user.Username + (resetPassword ? " (password reset)" : ""));
-            return AdminResult.Success(user.Id);
+            return AdminResult.Fail("The user account no longer exists.");
         }
+        if (await _users.EmailExists(email, id))
+        {
+            return AdminResult.Fail("The email address " + email + " is already in use.");
+        }
+
+        await _users.Update(id, fullName, email, resetPassword ? BCrypt.Net.BCrypt.HashPassword(newPassword) : null);
+        AdminLog.Write("Updated user " + user.Username + (resetPassword ? " (password reset)" : ""));
+        return AdminResult.Success(id);
     }
 
     /// <summary>Only users with no classes (taught or enrolled); others should be suspended in their classes instead.</summary>
     public async Task<AdminResult> Delete(int id)
     {
-        using (Prn212PQlbtContext db = DbFactory.Create())
+        User? user = await _users.GetById(id);
+        if (user == null)
         {
-            User? user = await db.Users.FirstOrDefaultAsync(u => u.Id == id);
-            if (user == null)
-            {
-                return AdminResult.Fail("User no longer exists.");
-            }
-            bool hasClasses = await db.Classes.AnyAsync(c => c.TeacherId == id) || await db.ClassStudents.AnyAsync(cs => cs.StudentId == id);
-            if (hasClasses)
-            {
-                return AdminResult.Fail(user.Username + " has classes and cannot be deleted. Suspend them in the class instead.");
-            }
-
-            db.Users.Remove(user);
-            await db.SaveChangesAsync();
-            AdminLog.Write("Deleted user " + user.Username);
-            return AdminResult.Success();
+            return AdminResult.Fail("The user account no longer exists.");
         }
+        if (await _users.HasClasses(id))
+        {
+            return AdminResult.Fail("The account " + user.Username + " cannot be deleted because it belongs to one or more classes. Please suspend the user in the class instead.");
+        }
+
+        await _users.Delete(id);
+        AdminLog.Write("Deleted user " + user.Username);
+        return AdminResult.Success();
     }
 
     private static string? ValidateUsername(string username)
     {
         if (username.Length == 0)
         {
-            return "Username is required.";
+            return "Please enter a username.";
         }
         if (username.Length > 20)
         {
-            return "Username is longer than 20 characters.";
+            return "The username must not exceed 20 characters.";
         }
         if (username.Any(char.IsWhiteSpace))
         {
-            return "Username cannot contain spaces.";
+            return "The username must not contain spaces.";
         }
         return null;
     }
@@ -149,24 +115,24 @@ public sealed class UserAdminService
     {
         if (fullName.Length == 0)
         {
-            return "Full name is required.";
+            return "Please enter a full name.";
         }
         if (fullName.Length > 100)
         {
-            return "Full name is longer than 100 characters.";
+            return "The full name must not exceed 100 characters.";
         }
         if (email.Length == 0)
         {
-            return "Email is required.";
+            return "Please enter an email address.";
         }
         if (email.Length > 100)
         {
-            return "Email is longer than 100 characters.";
+            return "The email address must not exceed 100 characters.";
         }
         int at = email.IndexOf('@');
         if (at <= 0 || at == email.Length - 1)
         {
-            return "Email is not valid.";
+            return "Please enter a valid email address.";
         }
         return null;
     }
@@ -175,7 +141,7 @@ public sealed class UserAdminService
     {
         if (password.Length < MinPasswordLength)
         {
-            return "Password must have at least " + MinPasswordLength + " characters.";
+            return "The password must contain at least " + MinPasswordLength + " characters.";
         }
         return null;
     }

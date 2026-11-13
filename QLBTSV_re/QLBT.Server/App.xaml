@@ -7,7 +7,6 @@
         <SolidColorBrush x:Key="StatusWarnBrush" Color="#E67E00" />
         <SolidColorBrush x:Key="StatusMutedBrush" Color="#808080" />
         <SolidColorBrush x:Key="ErrorBrush" Color="#C62828" />
-        <SolidColorBrush x:Key="InfoBrush" Color="#1565C0" />
         <SolidColorBrush x:Key="EditorBackgroundBrush" Color="#F7F9FC" />
         <SolidColorBrush x:Key="EditorBorderBrush" Color="#C9D3E0" />
 
@@ -48,17 +47,6 @@
             <Setter Property="Foreground" Value="{StaticResource ErrorBrush}" />
             <Setter Property="TextWrapping" Value="Wrap" />
             <Setter Property="Margin" Value="0,2,0,4" />
-        </Style>
-
-        <Style x:Key="InfoText" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource InfoBrush}" />
-            <Setter Property="TextWrapping" Value="Wrap" />
-            <Setter Property="Margin" Value="0,2,0,4" />
-        </Style>
-
-        <Style x:Key="FooterText" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource StatusMutedBrush}" />
-            <Setter Property="Margin" Value="2,4,0,0" />
         </Style>
 
         <Style TargetType="DataGrid">

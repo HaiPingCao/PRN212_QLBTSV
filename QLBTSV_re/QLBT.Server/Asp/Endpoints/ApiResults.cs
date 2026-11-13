@@ -35,7 +35,7 @@ public static class ApiResults
     {
         if (!System.IO.File.Exists(path))
         {
-            return Fail(ApiStatus.NotFound, "File is missing on the server.");
+            return Fail(ApiStatus.NotFound, "The file could not be found on the server.");
         }
         return Results.File(path, "application/octet-stream", fileName, enableRangeProcessing: true);
     }

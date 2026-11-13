@@ -4,7 +4,7 @@ using QLBT.Server.Asp;
 using QLBT.Server.Files;
 using QLBT.Server.Models;
 
-namespace QLBT.Server.Data;
+namespace QLBT.Server.DAO;
 
 /// <summary>
 /// DbContexts for code outside the HTTP pipeline (admin GUI). Works whether or not the server is running.
@@ -20,6 +20,15 @@ public static class DbFactory
         return new Prn212PQlbtContext(Options.Value);
     }
 
+    /// <summary>Connection test for the status bar: the database name, or null when it cannot connect.</summary>
+    public static async Task<string?> TestConnection()
+    {
+        using (Prn212PQlbtContext db = Create())
+        {
+            return await db.Database.CanConnectAsync() ? db.Database.GetDbConnection().Database : null;
+        }
+    }
+
     /// <summary>Same storage root the HTTP server uses (from the saved server settings).</summary>
     public static FileStorage Storage()
     {
@@ -33,7 +42,7 @@ public static class DbFactory
             .AddJsonFile("appsettings.json", optional: false)
             .Build();
         string connectionString = config.GetConnectionString("Default")
-            ?? throw new InvalidOperationException("ConnectionStrings:Default is missing in appsettings.json.");
+            ?? throw new InvalidOperationException("ConnectionStrings is missing in appsettings.json.");
         return new DbContextOptionsBuilder<Prn212PQlbtContext>()
             .UseSqlServer(connectionString)
             .Options;

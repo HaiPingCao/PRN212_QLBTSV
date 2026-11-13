@@ -1,33 +1,18 @@
-using Microsoft.EntityFrameworkCore;
-using QLBT.Server.Data;
+using QLBT.Server.DAO;
 using QLBT.Server.Domain;
 using QLBT.Server.Models;
 
 namespace QLBT.Server.Admin;
 
-/// <summary>
-/// Semesters. Before the start: edit anything, delete if it has no classes.
-/// After the start: start date locked, end date can only move later, no delete.
-/// </summary>
+/// <summary>Semesters. Name and dates can always be edited; a semester can be deleted only when it has no classes.</summary>
 public sealed class SemesterAdminService
 {
+    private readonly SemesterDAO _semesters = new SemesterDAO();
+
     /// <summary>Newest start date first.</summary>
-    public async Task<List<SemesterRow>> List()
+    public Task<List<SemesterRow>> List()
     {
-        using (Prn212PQlbtContext db = DbFactory.Create())
-        {
-            return await db.Semesters.AsNoTracking()
-                .OrderByDescending(s => s.StartDate)
-                .Select(s => new SemesterRow
-                {
-                    Id = s.Id,
-                    Name = s.Name,
-                    StartDate = s.StartDate,
-                    EndDate = s.EndDate,
-                    ClassCount = s.Classes.Count
-                })
-                .ToListAsync();
-        }
+        return _semesters.List();
     }
 
     public async Task<AdminResult> Create(string name, DateOnly startDate, DateOnly endDate)
@@ -38,20 +23,14 @@ public sealed class SemesterAdminService
         {
             return AdminResult.Fail(invalid);
         }
-
-        using (Prn212PQlbtContext db = DbFactory.Create())
+        if (await _semesters.NameExists(name, null))
         {
-            if (await db.Semesters.AnyAsync(s => s.Name == name))
-            {
-                return AdminResult.Fail("Semester " + name + " already exists.");
-            }
-
-            Semester semester = new Semester { Name = name, StartDate = startDate, EndDate = endDate };
-            db.Semesters.Add(semester);
-            await db.SaveChangesAsync();
-            AdminLog.Write("Created semester " + name + " (" + startDate + " - " + endDate + ")");
-            return AdminResult.Success(semester.Id);
+            return AdminResult.Fail("A semester named " + name + " already exists.");
         }
+
+        int id = await _semesters.Insert(new Semester { Name = name, StartDate = startDate, EndDate = endDate });
+        AdminLog.Write("Created semester " + name + " (" + startDate + " - " + endDate + ")");
+        return AdminResult.Success(id);
     }
 
     public async Task<AdminResult> Update(int id, string name, DateOnly startDate, DateOnly endDate)
@@ -62,78 +41,51 @@ public sealed class SemesterAdminService
         {
             return AdminResult.Fail(invalid);
         }
-
-        using (Prn212PQlbtContext db = DbFactory.Create())
+        if (await _semesters.GetById(id) == null)
         {
-            Semester? semester = await db.Semesters.FirstOrDefaultAsync(s => s.Id == id);
-            if (semester == null)
-            {
-                return AdminResult.Fail("Semester no longer exists.");
-            }
-            if (SemesterRules.HasStarted(semester))
-            {
-                if (startDate != semester.StartDate)
-                {
-                    return AdminResult.Fail("Semester " + semester.Name + " has started: the start date is locked.");
-                }
-                if (!SemesterRules.CanSetEndDate(semester, endDate))
-                {
-                    return AdminResult.Fail("Semester " + semester.Name + " has started: the end date can only move later.");
-                }
-            }
-            if (await db.Semesters.AnyAsync(s => s.Name == name && s.Id != id))
-            {
-                return AdminResult.Fail("Semester " + name + " already exists.");
-            }
-
-            semester.Name = name;
-            semester.StartDate = startDate;
-            semester.EndDate = endDate;
-            await db.SaveChangesAsync();
-            AdminLog.Write("Updated semester " + name + " (" + startDate + " - " + endDate + ")");
-            return AdminResult.Success(semester.Id);
+            return AdminResult.Fail("The semester no longer exists.");
         }
+        if (await _semesters.NameExists(name, id))
+        {
+            return AdminResult.Fail("A semester named " + name + " already exists.");
+        }
+
+        await _semesters.Update(id, name, startDate, endDate);
+        AdminLog.Write("Updated semester " + name + " (" + startDate + " - " + endDate + ")");
+        return AdminResult.Success(id);
     }
 
-    /// <summary>Only a semester that has not started and has no classes (delete its classes first).</summary>
+    /// <summary>Only a semester with no classes (delete its classes first).</summary>
     public async Task<AdminResult> Delete(int id)
     {
-        using (Prn212PQlbtContext db = DbFactory.Create())
+        Semester? semester = await _semesters.GetById(id);
+        if (semester == null)
         {
-            Semester? semester = await db.Semesters.FirstOrDefaultAsync(s => s.Id == id);
-            if (semester == null)
-            {
-                return AdminResult.Fail("Semester no longer exists.");
-            }
-            if (SemesterRules.HasStarted(semester))
-            {
-                return AdminResult.Fail("Semester " + semester.Name + " has started and cannot be deleted.");
-            }
-            if (await db.Classes.AnyAsync(c => c.SemesterId == id))
-            {
-                return AdminResult.Fail("Semester " + semester.Name + " still has classes. Delete them first.");
-            }
-
-            db.Semesters.Remove(semester);
-            await db.SaveChangesAsync();
-            AdminLog.Write("Deleted semester " + semester.Name);
-            return AdminResult.Success();
+            return AdminResult.Fail("The semester no longer exists.");
         }
+        if (await _semesters.HasClasses(id))
+        {
+            return AdminResult.Fail("Semester " + semester.Name + " cannot be deleted because it still contains classes. Please delete those classes first.");
+        }
+
+        await _semesters.Delete(id);
+        AdminLog.Write("Deleted semester " + semester.Name);
+        return AdminResult.Success();
     }
 
     private static string? Validate(string name, DateOnly startDate, DateOnly endDate)
     {
         if (name.Length == 0)
         {
-            return "Name is required.";
+            return "Please enter a name.";
         }
         if (name.Length > 20)
         {
-            return "Name is longer than 20 characters.";
+            return "The name must not exceed 20 characters.";
         }
         if (endDate <= startDate)
         {
-            return "End date must be after the start date.";
+            return "The end date must be later than the start date.";
         }
         return null;
     }

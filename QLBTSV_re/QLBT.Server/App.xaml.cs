@@ -29,8 +29,8 @@ namespace QLBT.Server
             e.Handled = true;
             Exception root = e.Exception.GetBaseException();
             Admin.AdminLog.Write("Unexpected error: " + e.Exception);
-            MessageBox.Show(MainWindow, "Unexpected error:\n\n" + root.Message + "\n\nDetails are in the Server log tab.",
-                "QLBT Server", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(MainWindow, "An unexpected error has occurred:\n\n" + root.Message + "\n\nFurther details are available in the Server log tab.",
+                "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         protected override void OnExit(ExitEventArgs e)

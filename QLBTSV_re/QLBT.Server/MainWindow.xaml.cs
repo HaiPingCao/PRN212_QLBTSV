@@ -1,9 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using QLBT.Server.Admin;
 using QLBT.Server.Asp;
-using QLBT.Server.Data;
-using QLBT.Server.Models;
+using QLBT.Server.DAO;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Net;
@@ -81,7 +79,7 @@ namespace QLBT.Server
             }
             catch (Exception ex) // port in use, address not on this PC, bad appsettings.json...
             {
-                error = "Failed to start: " + ex.Message;
+                error = "The server failed to start: " + ex.Message;
                 Log(error);
             }
             SetBusy(false, null);
@@ -166,18 +164,18 @@ namespace QLBT.Server
             string addressText = AddressBox.Text.Trim();
             if (!IPAddress.TryParse(addressText, out IPAddress? address))
             {
-                return Invalid("IP address is not valid: " + addressText);
+                return Invalid("The IP address \"" + addressText + "\" is not valid.");
             }
 
             if (!int.TryParse(PortBox.Text.Trim(), out int port) || port < 1 || port > 65535)
             {
-                return Invalid("Port must be a number from 1 to 65535.");
+                return Invalid("The port must be a number between 1 and 65535.");
             }
 
             string storage = StorageBox.Text.Trim();
             if (storage.Length == 0)
             {
-                return Invalid("File save path is required.");
+                return Invalid("Please specify a folder for saving files.");
             }
             try
             {
@@ -186,7 +184,7 @@ namespace QLBT.Server
             }
             catch (Exception ex)
             {
-                return Invalid("Cannot use file save path: " + ex.Message);
+                return Invalid("The specified folder for saving files cannot be used: " + ex.Message);
             }
 
             StorageBox.Text = storage;
@@ -201,7 +199,7 @@ namespace QLBT.Server
 
         private ServerSettings? Invalid(string message)
         {
-            MessageBox.Show(this, message, Title, MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(this, message, "Invalid Settings", MessageBoxButton.OK, MessageBoxImage.Warning);
             return null;
         }
 
@@ -245,11 +243,9 @@ namespace QLBT.Server
             bool ok;
             try
             {
-                using (Prn212PQlbtContext db = DbFactory.Create())
-                {
-                    ok = await db.Database.CanConnectAsync();
-                    text = ok ? "DB: " + db.Database.GetDbConnection().Database + "  OK" : "DB: cannot connect";
-                }
+                string? database = await DbFactory.TestConnection();
+                ok = database != null;
+                text = ok ? "DB: " + database + "  OK" : "DB: cannot connect";
             }
             catch (Exception ex)
             {

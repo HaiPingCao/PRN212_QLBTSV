@@ -26,17 +26,14 @@ public sealed partial class AddStudentsDialog : Window
 
     private async void Window_Loaded(object sender, RoutedEventArgs e)
     {
-        try
+        List<SelectableStudent>? students = await ViewHelper.Run(this, () => _service.ListAvailableStudents(_class.Id));
+        if (students == null)
         {
-            _students = await _service.ListAvailableStudents(_class.Id);
-        }
-        catch (Exception ex)
-        {
-            ViewHelper.ShowError(this, ex);
             Close();
             return;
         }
 
+        _students = students;
         StudentsGrid.ItemsSource = _students;
         _view = CollectionViewSource.GetDefaultView(_students);
         _view.Filter = Matches;
@@ -71,26 +68,15 @@ public sealed partial class AddStudentsDialog : Window
         List<int> ids = _students.Where(s => s.IsSelected).Select(s => s.Id).ToList();
         if (ids.Count == 0)
         {
-            ViewHelper.SetMessage(ErrorText, "Select at least one student.");
+            ViewHelper.SetMessage(ErrorText, "Please select at least one student.");
             return;
         }
 
-        AdminResult result;
-        IsEnabled = false;
-        try
+        AdminResult? result = await ViewHelper.Run(this, () => _service.AddStudents(_class.Id, ids));
+        if (result == null)
         {
-            result = await _service.AddStudents(_class.Id, ids);
-        }
-        catch (Exception ex)
-        {
-            ViewHelper.ShowError(this, ex);
             return;
         }
-        finally
-        {
-            IsEnabled = true;
-        }
-
         if (!result.Ok)
         {
             ViewHelper.SetMessage(ErrorText, result.Error);

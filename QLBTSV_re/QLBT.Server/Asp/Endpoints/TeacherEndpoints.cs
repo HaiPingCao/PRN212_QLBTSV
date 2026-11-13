@@ -219,7 +219,7 @@ public static class TeacherEndpoints
         string? cleanName = FileReceiver.CleanFileName(fileName);
         if (cleanName == null)
         {
-            return ApiResults.Fail(ApiStatus.Rejected, "Missing or invalid file name.");
+            return ApiResults.Fail(ApiStatus.Rejected, "The file name is missing or invalid.");
         }
 
         // All checks happen before the body is read: with "Expect: 100-continue" the client never sends the bytes.
@@ -261,7 +261,7 @@ public static class TeacherEndpoints
         }
         if (assignment!.FileName == null)
         {
-            return ApiResults.Fail(ApiStatus.NotFound, "This assignment has no file.");
+            return ApiResults.Fail(ApiStatus.NotFound, "This assignment does not have an attached file.");
         }
         return ApiResults.File(storage.AssignmentFile(assignment.Class.SemesterId, assignment.ClassId, assignment.Id), assignment.FileName);
     }
@@ -274,19 +274,19 @@ public static class TeacherEndpoints
             .FirstOrDefaultAsync(s => s.Id == id);
         if (submission == null)
         {
-            return ApiResults.Fail(ApiStatus.NotFound, "Submission not found.");
+            return ApiResults.Fail(ApiStatus.NotFound, "The submission could not be found.");
         }
         if (submission.Assignment.Class.TeacherId != user.GetUserId())
         {
-            return ApiResults.Fail(ApiStatus.Forbidden, "You do not teach this class.");
+            return ApiResults.Fail(ApiStatus.Forbidden, "You are not the teacher of this class.");
         }
         if (!AssignmentRules.IsClosed(submission.Assignment, DateTime.Now))
         {
-            return ApiResults.Fail(ApiStatus.Rejected, "Close the assignment before grading.");
+            return ApiResults.Fail(ApiStatus.Rejected, "The assignment must be closed before it can be graded.");
         }
         if (request.Score < 0 || request.Score > 10 || decimal.Round(request.Score, 2) != request.Score)
         {
-            return ApiResults.Fail(ApiStatus.Rejected, "Score must be between 0 and 10 with at most 2 decimals.");
+            return ApiResults.Fail(ApiStatus.Rejected, "The score must be a number from 0 to 10 with no more than two decimal places.");
         }
 
         submission.Score = request.Score;
@@ -303,11 +303,11 @@ public static class TeacherEndpoints
             .FirstOrDefaultAsync(s => s.Id == id);
         if (submission == null)
         {
-            return ApiResults.Fail(ApiStatus.NotFound, "Submission not found.");
+            return ApiResults.Fail(ApiStatus.NotFound, "The submission could not be found.");
         }
         if (submission.Assignment.Class.TeacherId != user.GetUserId())
         {
-            return ApiResults.Fail(ApiStatus.Forbidden, "You do not teach this class.");
+            return ApiResults.Fail(ApiStatus.Forbidden, "You are not the teacher of this class.");
         }
 
         string path = storage.SubmissionFile(submission.Assignment.Class.SemesterId, submission.ClassId, submission.AssignmentId, submission.Id);
@@ -323,11 +323,11 @@ public static class TeacherEndpoints
         int? owner = await db.Classes.AsNoTracking().Where(c => c.Id == classId).Select(c => (int?)c.TeacherId).FirstOrDefaultAsync();
         if (owner == null)
         {
-            return ApiResults.Fail(ApiStatus.NotFound, "Class not found.");
+            return ApiResults.Fail(ApiStatus.NotFound, "The class could not be found.");
         }
         if (owner != teacherId)
         {
-            return ApiResults.Fail(ApiStatus.Forbidden, "You do not teach this class.");
+            return ApiResults.Fail(ApiStatus.Forbidden, "You are not the teacher of this class.");
         }
         return null;
     }
@@ -337,11 +337,11 @@ public static class TeacherEndpoints
     {
         if (assignment == null)
         {
-            return ApiResults.Fail(ApiStatus.NotFound, "Assignment not found.");
+            return ApiResults.Fail(ApiStatus.NotFound, "The assignment could not be found.");
         }
         if (assignment.Class.TeacherId != teacherId)
         {
-            return ApiResults.Fail(ApiStatus.Forbidden, "You do not teach this class.");
+            return ApiResults.Fail(ApiStatus.Forbidden, "You are not the teacher of this class.");
         }
         return null;
     }
@@ -350,15 +350,15 @@ public static class TeacherEndpoints
     {
         if (string.IsNullOrWhiteSpace(request.Title))
         {
-            return "Title is required.";
+            return "Please enter a title.";
         }
         if (request.Title.Trim().Length > 255)
         {
-            return "Title is longer than 255 characters.";
+            return "The title must not exceed 255 characters.";
         }
         if (request.DueDate == default)
         {
-            return "Due date is required.";
+            return "Please specify a due date.";
         }
         return null;
     }
