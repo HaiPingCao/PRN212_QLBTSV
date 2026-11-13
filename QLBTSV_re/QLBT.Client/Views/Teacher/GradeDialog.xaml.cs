@@ -32,7 +32,7 @@ public sealed partial class GradeDialog : Window
         FileText.Text = submission.FileName;
         ScoreBox.Text = UiHelper.FormatScore(submission.Score);
         CommentBox.Text = submission.Comment ?? "";
-        StatusText.Text = submission.Score == null ? "Not graded yet" : "Re-grading overwrites the score and comment.";
+        StatusText.Text = submission.Score == null ? "Not graded yet" : "Saving will replace the existing score and comment.";
     }
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -64,13 +64,13 @@ public sealed partial class GradeDialog : Window
     {
         if (ScoreBox.Text.Trim().Length == 0)
         {
-            UiHelper.SetMessage(ErrorText, "Enter a score.");
+            UiHelper.SetMessage(ErrorText, "Please enter a score.");
             ScoreBox.Focus();
             return;
         }
         if (!TryParseScore(ScoreBox.Text, out decimal score))
         {
-            UiHelper.SetMessage(ErrorText, "Score must be between 0 and 10 with at most 2 decimals.");
+            UiHelper.SetMessage(ErrorText, "The score must be a number from 0 to 10 with no more than two decimal places.");
             ScoreBox.Focus();
             return;
         }

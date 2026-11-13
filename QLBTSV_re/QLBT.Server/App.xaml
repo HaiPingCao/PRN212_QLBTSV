@@ -49,6 +49,12 @@
             <Setter Property="Margin" Value="0,2,0,4" />
         </Style>
 
+        <Style x:Key="WarningText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource StatusWarnBrush}" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Margin" Value="0,2,0,4" />
+        </Style>
+
         <Style TargetType="DataGrid">
             <Setter Property="IsReadOnly" Value="True" />
             <Setter Property="AutoGenerateColumns" Value="False" />

@@ -391,7 +391,7 @@ public sealed partial class TeacherWindow : Window
         {
             StatusValueText.Text = "New";
             StatusValueText.Foreground = (Brush)FindResource("StatusMutedBrush");
-            UiHelper.SetMessage(InfoText, "ℹ A new assignment starts open. The file can be chosen now or later.");
+            UiHelper.SetMessage(InfoText, "ℹ A new assignment is open once it is created. The assignment file may be attached now or later.");
             return;
         }
 
@@ -402,19 +402,19 @@ public sealed partial class TeacherWindow : Window
         string info;
         if (a.IsClosedManually)
         {
-            info = "Closed manually: students cannot submit. Grading is enabled. Untick \"Closed manually\" to reopen.";
+            info = "This assignment has been closed manually. Students can no longer submit, and grading is available. Clear \"Closed manually\" to reopen it.";
         }
         else if (a.IsClosed)
         {
-            info = "Past due and late submissions are not allowed: closed. Grading is enabled. Extend the due date to reopen.";
+            info = "The due date has passed and late submissions are not allowed, so this assignment is closed. Grading is available. Extend the due date to reopen it.";
         }
         else if (pastDue)
         {
-            info = "Past due but late submissions are allowed: still open. Close it manually to grade.";
+            info = "The due date has passed, but late submissions are allowed, so this assignment remains open. Close it manually to enable grading.";
         }
         else
         {
-            info = "Open until " + a.DueDate.ToString(UiHelper.DateTimeFormat) + ". Grading is enabled once it is closed.";
+            info = "This assignment is open until " + a.DueDate.ToString(UiHelper.DateTimeFormat) + ". Grading will be available once it is closed.";
         }
         UiHelper.SetMessage(InfoText, "ℹ " + info);
     }
@@ -463,18 +463,18 @@ public sealed partial class TeacherWindow : Window
         string title = TitleBox.Text.Trim();
         if (title.Length == 0)
         {
-            UiHelper.SetMessage(ErrorText, "Title is required.");
+            UiHelper.SetMessage(ErrorText, "Please enter a title.");
             return null;
         }
         if (DueDatePicker.SelectedDate == null)
         {
-            UiHelper.SetMessage(ErrorText, "Choose a due date.");
+            UiHelper.SetMessage(ErrorText, "Please select a due date.");
             return null;
         }
         if (!DateTime.TryParseExact(DueTimeBox.Text.Trim(), new[] { "H:mm", "HH:mm" }, CultureInfo.InvariantCulture,
                 DateTimeStyles.None, out DateTime time))
         {
-            UiHelper.SetMessage(ErrorText, "Due time must be HH:mm, e.g. 23:59.");
+            UiHelper.SetMessage(ErrorText, "Please enter the due time in HH:mm format (for example, 23:59).");
             return null;
         }
 
@@ -501,7 +501,7 @@ public sealed partial class TeacherWindow : Window
         }
         UiHelper.SetMessage(ErrorText, null);
         if (_editing == null && request.DueDate < DateTime.Now
-            && !UiHelper.Confirm(this, "The due date is in the past, so the assignment may be closed right away. Create it anyway?"))
+            && !UiHelper.Confirm(this, "The selected due date has already passed, so the assignment may be closed immediately. Do you want to create it anyway?"))
         {
             return;
         }
@@ -550,8 +550,8 @@ public sealed partial class TeacherWindow : Window
         await ReloadAssignments(id);
         if (uploadError != null)
         {
-            UiHelper.Warn(this, "The assignment was saved, but the file upload failed:\n\n" + uploadError
-                + "\n\nChoose the file again and Save to retry.");
+            UiHelper.Warn(this, "The assignment has been saved, but the file could not be uploaded:\n\n" + uploadError
+                + "\n\nPlease select the file again and click Save to retry.");
         }
     }
 
@@ -563,9 +563,9 @@ public sealed partial class TeacherWindow : Window
         }
         TeacherAssignmentDto a = _editing.Dto;
         string what = a.SubmissionCount > 0
-            ? "This also deletes " + a.SubmissionCount + " submission(s), their scores and all files."
-            : "This also deletes its file.";
-        if (!UiHelper.Confirm(this, "Delete \"" + a.Title + "\"?\n\n" + what))
+            ? "This will also permanently delete " + a.SubmissionCount + " submission(s), including their scores and files."
+            : "This will also permanently delete the assignment file.";
+        if (!UiHelper.Confirm(this, "Are you sure you want to delete the assignment \"" + a.Title + "\"?\n\n" + what + " This action cannot be undone."))
         {
             return;
         }
@@ -672,8 +672,8 @@ public sealed partial class TeacherWindow : Window
         DeleteSubmissionButton.IsEnabled = selected;
         GradeButton.IsEnabled = selected && closed;
         GradeButton.ToolTip = closed
-            ? "Grade or re-grade the selected submission"
-            : "Close the assignment before grading.";
+            ? "Grade or re-grade the selected submission."
+            : "The assignment must be closed before it can be graded.";
     }
 
     private async void DownloadSubmission_Click(object sender, RoutedEventArgs e)
@@ -726,8 +726,8 @@ public sealed partial class TeacherWindow : Window
             return;
         }
         string score = row.IsGraded ? " and its score (" + row.ScoreText + ")" : "";
-        if (!UiHelper.Confirm(this, "Delete the submission of " + row.StudentUsername + score + "?\n\n"
-            + "The file is deleted and the student can submit again."))
+        if (!UiHelper.Confirm(this, "Are you sure you want to delete the submission of " + row.StudentUsername + score + "?\n\n"
+            + "The submitted file will be permanently deleted, and the student will be able to submit again."))
         {
             return;
         }

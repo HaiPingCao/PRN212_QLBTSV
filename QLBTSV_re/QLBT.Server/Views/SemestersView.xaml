@@ -39,13 +39,14 @@
                                 Style="{StaticResource FieldBox}" />
                 </Grid>
 
+                <TextBlock x:Name="WarningText" Style="{StaticResource WarningText}" Visibility="Collapsed" />
                 <TextBlock x:Name="ErrorText" Style="{StaticResource ErrorText}" Visibility="Collapsed" />
 
                 <DockPanel Margin="0,6,0,0">
                     <Button x:Name="DeleteButton" DockPanel.Dock="Right" Content="Delete" Style="{StaticResource ToolbarButton}" Margin="0"
                             Click="Delete_Click" />
                     <Button DockPanel.Dock="Right" Content="+ New" Style="{StaticResource ToolbarButton}" Click="New_Click" />
-                    <Button Content="Save" Style="{StaticResource ToolbarButton}" HorizontalAlignment="Left" Click="Save_Click" />
+                    <Button x:Name="SaveButton" Content="Save" Style="{StaticResource ToolbarButton}" HorizontalAlignment="Left" Click="Save_Click" />
                 </DockPanel>
             </StackPanel>
         </GroupBox>

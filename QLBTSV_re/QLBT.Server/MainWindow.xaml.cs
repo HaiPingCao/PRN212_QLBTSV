@@ -245,7 +245,7 @@ namespace QLBT.Server
             {
                 string? database = await DbFactory.TestConnection();
                 ok = database != null;
-                text = ok ? "DB: " + database + "  OK" : "DB: cannot connect";
+                text = ok ? "DB: " + database + " connected" : "DB: cannot connect";
             }
             catch (Exception ex)
             {

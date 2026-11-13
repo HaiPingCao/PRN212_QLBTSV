@@ -23,7 +23,7 @@ public sealed partial class LoginWindow : Window
         string username = UsernameBox.Text.Trim();
         if (username.Length == 0 || PasswordBox.Password.Length == 0)
         {
-            UiHelper.SetMessage(ErrorText, "Enter your username and password.");
+            UiHelper.SetMessage(ErrorText, "Please enter your username and password.");
             return;
         }
 

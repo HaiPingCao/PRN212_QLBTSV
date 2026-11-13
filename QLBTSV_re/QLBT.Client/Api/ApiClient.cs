@@ -24,7 +24,30 @@ public class ApiResult
     /// <summary>The server's error text, or a generic one built from the status.</summary>
     public string Message
     {
-        get { return string.IsNullOrWhiteSpace(Error) ? Status.ToString() : Error; }
+        get { return string.IsNullOrWhiteSpace(Error) ? DefaultMessage() : Error; }
+    }
+
+    private string DefaultMessage()
+    {
+        if (HttpStatus == 413)
+        {
+            return "The file exceeds the maximum upload size permitted by the server.";
+        }
+        switch (Status)
+        {
+            case ApiStatus.InvalidCredentials:
+                return "The username or password is incorrect.";
+            case ApiStatus.Unauthorized:
+                return "You are not logged in, or your session has expired.";
+            case ApiStatus.Forbidden:
+                return "You do not have permission to perform this operation.";
+            case ApiStatus.NotFound:
+                return "The requested item could not be found.";
+            case ApiStatus.Rejected:
+                return "The request was rejected by the server.";
+            default:
+                return "An unexpected server error has occurred. Please try again later.";
+        }
     }
 }
 
@@ -45,7 +68,7 @@ public sealed class DownloadedFile
 /// <summary>
 /// HTTP wrapper (ported from Svr3.Client). Keeps the SessionId and sends it as a Bearer token.
 /// Per Plan.md: an Unauthorized answer or a Logout always clears the SessionId.
-/// Network failures never throw: they come back as Status = Error with a "Cannot reach server" message.
+/// Network failures never throw: they come back as Status = Error with an "Unable to connect to the server" message.
 /// </summary>
 public sealed class ApiClient : IDisposable
 {
@@ -120,11 +143,11 @@ public sealed class ApiClient : IDisposable
         }
         catch (IOException ex)
         {
-            return Fail<TBody>(ApiStatus.Error, "Cannot read the file: " + ex.Message);
+            return Fail<TBody>(ApiStatus.Error, "Unable to read the selected file: " + ex.Message);
         }
         catch (UnauthorizedAccessException ex)
         {
-            return Fail<TBody>(ApiStatus.Error, "Cannot read the file: " + ex.Message);
+            return Fail<TBody>(ApiStatus.Error, "Unable to read the selected file: " + ex.Message);
         }
 
         using (source)
@@ -190,11 +213,11 @@ public sealed class ApiClient : IDisposable
         catch (IOException ex)
         {
             DeletePartial(target);
-            return Fail<DownloadedFile>(ApiStatus.Error, "Download failed: " + ex.Message);
+            return Fail<DownloadedFile>(ApiStatus.Error, "The download could not be completed: " + ex.Message);
         }
         catch (UnauthorizedAccessException ex)
         {
-            return Fail<DownloadedFile>(ApiStatus.Error, "Cannot write the file: " + ex.Message);
+            return Fail<DownloadedFile>(ApiStatus.Error, "Unable to save the file: " + ex.Message);
         }
     }
 
@@ -268,7 +291,7 @@ public sealed class ApiClient : IDisposable
 
     private ApiResult<TBody> Unreachable<TBody>(Exception ex)
     {
-        return Fail<TBody>(ApiStatus.Error, "Cannot reach server " + BaseAddress + "\n" + ex.GetBaseException().Message);
+        return Fail<TBody>(ApiStatus.Error, "Unable to connect to the server at " + BaseAddress + ". Please verify that the server is running and try again.\n\nDetails: " + ex.GetBaseException().Message);
     }
 
     private static void DeletePartial(string? path)

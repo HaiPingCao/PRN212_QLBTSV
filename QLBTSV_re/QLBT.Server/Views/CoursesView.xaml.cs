@@ -63,6 +63,7 @@ public sealed partial class CoursesView : UserControl
     {
         CoursesGrid.SelectedItem = null;
         ClearEditor();
+        EditorBox.Visibility = Visibility.Visible;
         CodeBox.Focus();
     }
 
@@ -127,23 +128,29 @@ public sealed partial class CoursesView : UserControl
             || row.Name.Contains(search, StringComparison.OrdinalIgnoreCase);
     }
 
+    /// <summary>Edit mode: shows the editor; warns when classes use the course (a change applies to all of them).</summary>
     private void FillEditor(CourseRow row)
     {
         _editing = row;
+        EditorBox.Visibility = Visibility.Visible;
         EditorTitle.Text = "Edit course " + row.Code;
         CodeBox.Text = row.Code;
         NameBox.Text = row.Name;
         DeleteButton.Visibility = Visibility.Visible;
+        ViewHelper.SetMessage(WarningText, row.ClassCount > 0 ? "This course has " + row.ClassCount + " class(es)." : null);
         ViewHelper.SetMessage(ErrorText, null);
     }
 
+    /// <summary>No course selected: empty fields and the editor hidden ("+ New" shows it).</summary>
     private void ClearEditor()
     {
         _editing = null;
+        EditorBox.Visibility = Visibility.Collapsed;
         EditorTitle.Text = "New course";
         CodeBox.Clear();
         NameBox.Clear();
         DeleteButton.Visibility = Visibility.Collapsed;
+        ViewHelper.SetMessage(WarningText, null);
         ViewHelper.SetMessage(ErrorText, null);
     }
 }

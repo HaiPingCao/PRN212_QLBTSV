@@ -49,18 +49,18 @@ public static class UiHelper
 
     public static void Warn(DependencyObject owner, string message)
     {
-        MessageBox.Show(Window.GetWindow(owner), message, "QLBT", MessageBoxButton.OK, MessageBoxImage.Warning);
+        MessageBox.Show(Window.GetWindow(owner), message, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
     }
 
     public static bool Confirm(DependencyObject owner, string message)
     {
-        return MessageBox.Show(Window.GetWindow(owner), message, "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question,
+        return MessageBox.Show(Window.GetWindow(owner), message, "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question,
             MessageBoxResult.No) == MessageBoxResult.Yes;
     }
 
     public static bool ConfirmDiscard(DependencyObject owner, bool dirty)
     {
-        return !dirty || Confirm(owner, "Discard unsaved changes?");
+        return !dirty || Confirm(owner, "You have unsaved changes. Do you want to discard them?");
     }
 
     /// <summary>Open dialog for an upload (any file type; one file, zip several).</summary>

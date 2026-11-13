@@ -117,14 +117,24 @@ public sealed partial class SemestersView : UserControl
         await Reload(_editing?.Id);
     }
 
+    /// <summary>Edit mode. An ended semester is shown read-only; a running one shows a warning.</summary>
     private void FillEditor(SemesterRow row)
     {
         _editing = row;
-        EditorTitle.Text = "Edit semester " + row.Name;
+        bool ended = row.Status == SemesterStatus.Ended;
+        EditorTitle.Text = (ended ? "Semester " : "Edit semester ") + row.Name;
         NameBox.Text = row.Name;
         StartPicker.SelectedDate = ViewHelper.ToDateTime(row.StartDate);
         EndPicker.SelectedDate = ViewHelper.ToDateTime(row.EndDate);
+        SetLocked(ended);
         DeleteButton.Visibility = Visibility.Visible;
+        string? warning = row.Status switch
+        {
+            SemesterStatus.Ended => "This semester has ended. Its information can no longer be changed.",
+            SemesterStatus.Running => "This semester has already started.",
+            _ => null
+        };
+        ViewHelper.SetMessage(WarningText, warning);
         ViewHelper.SetMessage(ErrorText, null);
     }
 
@@ -135,7 +145,18 @@ public sealed partial class SemestersView : UserControl
         NameBox.Clear();
         StartPicker.SelectedDate = null;
         EndPicker.SelectedDate = null;
+        SetLocked(false);
         DeleteButton.Visibility = Visibility.Collapsed;
+        ViewHelper.SetMessage(WarningText, null);
         ViewHelper.SetMessage(ErrorText, null);
+    }
+
+    private void SetLocked(bool locked)
+    {
+        NameBox.IsReadOnly = locked;
+        StartPicker.IsEnabled = !locked;
+        EndPicker.IsEnabled = !locked;
+        SaveButton.IsEnabled = !locked;
+        DeleteButton.IsEnabled = !locked;
     }
 }

@@ -5,12 +5,32 @@
     <Grid x:Name="Root" Margin="8">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- Editor -->
-        <GroupBox Grid.Row="0" Style="{StaticResource EditorPanel}">
+        <!-- Toolbar -->
+        <DockPanel Grid.Row="0" Margin="0,0,0,6">
+            <Button DockPanel.Dock="Right" Content="⟳ Refresh" Style="{StaticResource ToolbarButton}" Margin="0" Click="Refresh_Click" />
+            <Button DockPanel.Dock="Right" Content="+ New" Style="{StaticResource ToolbarButton}" Click="New_Click" />
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Search:" VerticalAlignment="Center" Margin="0,0,6,0" />
+                <TextBox x:Name="SearchBox" Width="240" VerticalContentAlignment="Center" ToolTip="Code or name"
+                         TextChanged="Search_Changed" />
+            </StackPanel>
+        </DockPanel>
+
+        <!-- List -->
+        <DataGrid Grid.Row="1" x:Name="CoursesGrid" SelectionChanged="Grid_SelectionChanged">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Code" Binding="{Binding Code}" Width="120" />
+                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="3*" />
+                <DataGridTextColumn Header="Classes" Binding="{Binding ClassCount}" Width="80" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Editor: shown only when a course is selected or "+ New" is clicked -->
+        <GroupBox Grid.Row="2" x:Name="EditorBox" Style="{StaticResource EditorPanel}" Margin="0,8,0,0" Visibility="Collapsed">
             <GroupBox.Header>
                 <TextBlock x:Name="EditorTitle" Style="{StaticResource EditorTitle}" Text="New course" />
             </GroupBox.Header>
@@ -30,34 +50,15 @@
                     <TextBox Grid.Column="3" x:Name="NameBox" MaxLength="100" Style="{StaticResource FieldBox}" />
                 </Grid>
 
+                <TextBlock x:Name="WarningText" Style="{StaticResource WarningText}" Visibility="Collapsed" />
                 <TextBlock x:Name="ErrorText" Style="{StaticResource ErrorText}" Visibility="Collapsed" />
 
                 <DockPanel Margin="0,6,0,0">
                     <Button x:Name="DeleteButton" DockPanel.Dock="Right" Content="Delete" Style="{StaticResource ToolbarButton}" Margin="0"
                             Click="Delete_Click" />
-                    <Button DockPanel.Dock="Right" Content="+ New" Style="{StaticResource ToolbarButton}" Click="New_Click" />
                     <Button Content="Save" Style="{StaticResource ToolbarButton}" HorizontalAlignment="Left" Click="Save_Click" />
                 </DockPanel>
             </StackPanel>
         </GroupBox>
-
-        <!-- Filter row -->
-        <DockPanel Grid.Row="1" Margin="0,0,0,6">
-            <Button DockPanel.Dock="Right" Content="⟳ Refresh" Style="{StaticResource ToolbarButton}" Margin="0" Click="Refresh_Click" />
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Search:" VerticalAlignment="Center" Margin="0,0,6,0" />
-                <TextBox x:Name="SearchBox" Width="240" VerticalContentAlignment="Center" ToolTip="Code or name"
-                         TextChanged="Search_Changed" />
-            </StackPanel>
-        </DockPanel>
-
-        <!-- List -->
-        <DataGrid Grid.Row="2" x:Name="CoursesGrid" SelectionChanged="Grid_SelectionChanged">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Code" Binding="{Binding Code}" Width="120" />
-                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="3*" />
-                <DataGridTextColumn Header="Classes" Binding="{Binding ClassCount}" Width="80" />
-            </DataGrid.Columns>
-        </DataGrid>
     </Grid>
 </UserControl>

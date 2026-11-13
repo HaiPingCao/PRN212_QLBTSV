@@ -56,7 +56,7 @@ public partial class App : Application
         }
         Session.Expire();
         Window? owner = Current.MainWindow;
-        MessageBox.Show(owner, "Your session has expired. Please log in again.", "QLBT", MessageBoxButton.OK, MessageBoxImage.Information);
+        MessageBox.Show(owner, "Your session has expired. Please log in again.", "Session Expired", MessageBoxButton.OK, MessageBoxImage.Information);
 
         List<Window> open = Current.Windows.Cast<Window>().ToList();
         ShowLogin();
@@ -101,7 +101,7 @@ public partial class App : Application
     private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
     {
         e.Handled = true;
-        MessageBox.Show(MainWindow, "Unexpected error:\n\n" + e.Exception.GetBaseException().Message, "QLBT",
+        MessageBox.Show(MainWindow, "An unexpected error has occurred:\n\n" + e.Exception.GetBaseException().Message, "Error",
             MessageBoxButton.OK, MessageBoxImage.Error);
     }
 }

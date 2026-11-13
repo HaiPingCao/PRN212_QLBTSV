@@ -184,12 +184,12 @@ public sealed partial class StudentWindow : Window
         DownloadAssignmentButton.IsEnabled = a.HasFile && !a.ClassSuspended;
         if (a.ClassSuspended)
         {
-            UiHelper.SetMessage(AssignmentInfo, "ℹ You are suspended in this class: you cannot download the assignment or submit. "
-                + "You can still view your score, comment and old submission.");
+            UiHelper.SetMessage(AssignmentInfo, "ℹ Your enrolment in this class has been suspended. You may no longer download the assignment or submit work; "
+                + "however, you may still view your score, the teacher's comment and your previous submission.");
         }
         else
         {
-            UiHelper.SetMessage(AssignmentInfo, a.HasFile ? null : "ℹ This assignment has no file.");
+            UiHelper.SetMessage(AssignmentInfo, a.HasFile ? null : "ℹ This assignment does not have an attached file.");
         }
 
         ShowSubmission(null, "Loading...");
@@ -245,19 +245,19 @@ public sealed partial class StudentWindow : Window
         }
         else if (a.ClassSuspended)
         {
-            blocked = "ℹ Suspended in this class: submitting is not allowed.";
+            blocked = "ℹ Your enrolment in this class has been suspended; submissions are not permitted.";
         }
         else if (a.IsClosed)
         {
-            blocked = "ℹ The assignment is closed.";
+            blocked = "ℹ This assignment is closed and no longer accepts submissions.";
         }
         else if (submission?.Score != null)
         {
-            blocked = "ℹ Graded: you can no longer resubmit.";
+            blocked = "ℹ Your submission has been graded and can no longer be replaced.";
         }
         SubmitButton.IsEnabled = blocked == null;
         UiHelper.SetMessage(SubmitInfo, blocked == null
-            ? (submission == null ? "ℹ One file per assignment; zip several files." : "ℹ Resubmitting replaces your previous file.")
+            ? (submission == null ? "ℹ Only one file may be submitted per assignment. Please compress multiple files into a single archive." : "ℹ Resubmitting will replace your previous file.")
             : blocked);
     }
 
@@ -311,7 +311,7 @@ public sealed partial class StudentWindow : Window
         {
             return;
         }
-        if (_submission != null && !UiHelper.Confirm(this, "Replace your submission " + _submission.FileName + " with " + Path.GetFileName(file) + "?"))
+        if (_submission != null && !UiHelper.Confirm(this, "Your current submission \"" + _submission.FileName + "\" will be replaced with \"" + Path.GetFileName(file) + "\". Do you want to continue?"))
         {
             return;
         }

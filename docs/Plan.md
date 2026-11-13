@@ -26,8 +26,9 @@ Quản lý bằng GUI ngay trên máy chủ (thao tác trực tiếp với CSDL,
   - Không bao giờ đổi kì học của lớp
 - Kì học
   - Thêm mới
-  - Sửa lúc nào cũng được; xóa chỉ khi kì không còn lớp nào
-- Giao diện: các tab Users, Semesters, Courses, Classes; mỗi tab có vùng sửa ở trên, danh sách ở dưới; tab Lớp có thêm danh sách sv của lớp đang chọn
+  - Sửa được khi kì chưa kết thúc (kì đang diễn ra chỉ hiện cảnh báo "đã bắt đầu"); xóa chỉ khi kì chưa kết thúc và không còn lớp nào
+  - Kì đã kết thúc bị khóa: không sửa, không xóa
+- Giao diện: các tab Users, Semesters, Courses, Classes; mỗi tab có vùng sửa ở trên, danh sách ở dưới (tab Courses: vùng sửa ở dưới, chỉ hiện khi chọn môn hoặc bấm "+ New"); tab Lớp có thêm danh sách sv của lớp đang chọn
 - File lưu trữ
   - Thư mục đặt theo ID, không theo tên (đổi tên trong CSDL không làm mất file):
 

@@ -4,7 +4,10 @@ using QLBT.Server.Models;
 
 namespace QLBT.Server.Admin;
 
-/// <summary>Semesters. Name and dates can always be edited; a semester can be deleted only when it has no classes.</summary>
+/// <summary>
+/// Semesters. Name and dates can be edited until the semester ends; an ended semester is read-only.
+/// A semester can be deleted only when it has not ended and has no classes.
+/// </summary>
 public sealed class SemesterAdminService
 {
     private readonly SemesterDAO _semesters = new SemesterDAO();
@@ -41,9 +44,14 @@ public sealed class SemesterAdminService
         {
             return AdminResult.Fail(invalid);
         }
-        if (await _semesters.GetById(id) == null)
+        Semester? semester = await _semesters.GetById(id);
+        if (semester == null)
         {
             return AdminResult.Fail("The semester no longer exists.");
+        }
+        if (HasEnded(semester))
+        {
+            return AdminResult.Fail(EndedMessage(semester));
         }
         if (await _semesters.NameExists(name, id))
         {
@@ -63,6 +71,10 @@ public sealed class SemesterAdminService
         {
             return AdminResult.Fail("The semester no longer exists.");
         }
+        if (HasEnded(semester))
+        {
+            return AdminResult.Fail(EndedMessage(semester));
+        }
         if (await _semesters.HasClasses(id))
         {
             return AdminResult.Fail("Semester " + semester.Name + " cannot be deleted because it still contains classes. Please delete those classes first.");
@@ -71,6 +83,17 @@ public sealed class SemesterAdminService
         await _semesters.Delete(id);
         AdminLog.Write("Deleted semester " + semester.Name);
         return AdminResult.Success();
+    }
+
+    /// <summary>An ended semester is read-only: it can no longer be edited or deleted.</summary>
+    private static bool HasEnded(Semester semester)
+    {
+        return SemesterRules.Status(semester.StartDate, semester.EndDate) == SemesterStatus.Ended;
+    }
+
+    private static string EndedMessage(Semester semester)
+    {
+        return "Semester " + semester.Name + " has ended and can no longer be changed.";
     }
 
     private static string? Validate(string name, DateOnly startDate, DateOnly endDate)

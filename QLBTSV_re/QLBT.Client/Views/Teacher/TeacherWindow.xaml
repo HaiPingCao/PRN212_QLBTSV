@@ -28,9 +28,10 @@
 
             <!-- Classes: class code only; details in the Class info dialog -->
             <DockPanel Grid.Column="0" Margin="0,0,8,0">
-                <TextBlock DockPanel.Dock="Top" Text="Classes" Style="{StaticResource EditorTitle}" Margin="0,0,0,6" />
-                <ComboBox DockPanel.Dock="Top" x:Name="SemesterBox" Margin="0,0,0,6" ToolTip="Semester"
+                <TextBlock DockPanel.Dock="Top" Text="Semester" Style="{StaticResource EditorTitle}" Margin="0,0,0,4" />
+                <ComboBox DockPanel.Dock="Top" x:Name="SemesterBox" Margin="0,0,0,12" ToolTip="Show the classes of this semester"
                           SelectionChanged="SemesterBox_SelectionChanged" />
+                <TextBlock DockPanel.Dock="Top" Text="Classes" Style="{StaticResource EditorTitle}" Margin="0,0,0,4" />
                 <Button DockPanel.Dock="Bottom" x:Name="ClassInfoButton" Content="Class info…" Margin="0,6,0,0" Padding="6,3"
                         ToolTipService.ShowOnDisabled="True" ToolTip="Course, semester and students of the class (or double-click)"
                         Click="ClassInfo_Click" />

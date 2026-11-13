@@ -164,7 +164,7 @@ Thứ tự này đặt kiểm tra quyền trước kiểm tra quy tắc, đúng 
 
 ### 6.3. Kỳ học và lớp học
 
-Kỳ học và lớp học sửa được bất cứ lúc nào; chỉ chặn những thao tác làm mất dữ liệu: không xoá kỳ còn lớp, không xoá môn đang được lớp dùng, không xoá người dùng đã có lớp. Một lớp không bao giờ đổi kỳ. Sinh viên đã có bài nộp thì không gỡ khỏi lớp mà dùng **đình chỉ** (`is_active = 0, left_at = now`) để giữ nguyên lịch sử điểm và bài nộp.
+Lớp học sửa được bất cứ lúc nào; kỳ học sửa được cho tới khi kết thúc (kỳ đang diễn ra chỉ hiện cảnh báo, kỳ đã kết thúc bị khoá: không sửa, không xoá). Ngoài ra chỉ chặn những thao tác làm mất dữ liệu: không xoá kỳ còn lớp, không xoá môn đang được lớp dùng, không xoá người dùng đã có lớp. Một lớp không bao giờ đổi kỳ. Sinh viên đã có bài nộp thì không gỡ khỏi lớp mà dùng **đình chỉ** (`is_active = 0, left_at = now`) để giữ nguyên lịch sử điểm và bài nộp.
 
 Đây là một lựa chọn đơn giản hoá có chủ đích: phiên bản trước có thêm các khoá theo "kỳ đã bắt đầu" (khoá ngày bắt đầu, không sửa lớp, không thêm/gỡ sinh viên), nhưng chúng làm giao diện và service phức tạp hơn nhiều so với giá trị mang lại cho một đồ án môn học.
 
