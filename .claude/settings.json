@@ -34,5 +34,9 @@
       "Bash(git push --force:*)",
       "PowerShell(git push --force:*)"
     ]
+  },
+  "attribution": {
+    "commit": "",
+    "pr": ""
   }
 }
