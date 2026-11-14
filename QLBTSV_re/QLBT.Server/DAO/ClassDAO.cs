@@ -15,8 +15,6 @@ public sealed class ClassDAO
 {
     private const string SameCourseIndex = "uq_class_students_course";
 
-    // ───────────────────────── Classes ─────────────────────────
-
     /// <param name="semesterId">null = every semester.</param>
     public async Task<List<ClassRow>> List(int? semesterId)
     {
@@ -125,8 +123,6 @@ public sealed class ClassDAO
             }
         }
     }
-
-    // ───────────────────────── Enrolments ─────────────────────────
 
     public async Task<List<ClassStudentRow>> ListStudents(int classId)
     {

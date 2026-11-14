@@ -47,8 +47,6 @@ public sealed partial class ClassesView : UserControl
         await ReloadClasses(null);
     }
 
-    // ───────────────────────── Loading ─────────────────────────
-
     /// <summary>Semester, course and teacher pickers. Changes made in the other tabs show up after Refresh.</summary>
     private async Task ReloadLookups()
     {
@@ -124,8 +122,6 @@ public sealed partial class ClassesView : UserControl
         StudentsGrid.SelectedItem = _students.FirstOrDefault(s => s.StudentId == selectedStudent);
         ShowStudents();
     }
-
-    // ───────────────────────── Class list and editor ─────────────────────────
 
     private async void SemesterFilter_Changed(object sender, SelectionChangedEventArgs e)
     {
@@ -289,8 +285,6 @@ public sealed partial class ClassesView : UserControl
             || row.CourseName.Contains(search, StringComparison.OrdinalIgnoreCase)
             || row.TeacherDisplay.Contains(search, StringComparison.OrdinalIgnoreCase);
     }
-
-    // ───────────────────────── Students of the selected class ─────────────────────────
 
     private void StudentsGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
