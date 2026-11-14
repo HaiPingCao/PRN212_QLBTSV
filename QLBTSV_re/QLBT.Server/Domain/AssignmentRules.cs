@@ -8,6 +8,12 @@ public static class AssignmentRules
     /// <summary>closed = IsClosed || (now > Deadline && !AllowLate)</summary>
     public static bool IsClosed(Assignment assignment, DateTime now)
     {
-        return assignment.IsClosed || (now > assignment.DueDate && !assignment.AllowLate);
+        return IsClosed(assignment.IsClosed, assignment.DueDate, assignment.AllowLate, now);
+    }
+
+    /// <summary>Same rule from the raw columns (used by the admin grid rows).</summary>
+    public static bool IsClosed(bool closedManually, DateTime dueDate, bool allowLate, DateTime now)
+    {
+        return closedManually || (now > dueDate && !allowLate);
     }
 }

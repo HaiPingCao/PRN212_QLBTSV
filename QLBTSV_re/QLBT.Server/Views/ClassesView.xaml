@@ -54,6 +54,8 @@
                     <Button x:Name="DeleteButton" DockPanel.Dock="Right" Content="Delete" Style="{StaticResource ToolbarButton}" Margin="0"
                             Click="Delete_Click" />
                     <Button DockPanel.Dock="Right" Content="+ New" Style="{StaticResource ToolbarButton}" Click="New_Click" />
+                    <Button x:Name="AssignmentsButton" DockPanel.Dock="Right" Content="Assignments…" Style="{StaticResource ToolbarButton}"
+                            ToolTip="View the assignments and submissions of this class (read-only)" Click="Assignments_Click" />
                     <Button Content="Save" Style="{StaticResource ToolbarButton}" HorizontalAlignment="Left" Click="Save_Click" />
                 </DockPanel>
             </StackPanel>

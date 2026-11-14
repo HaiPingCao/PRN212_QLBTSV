@@ -24,6 +24,7 @@ Quản lý bằng GUI ngay trên máy chủ (thao tác trực tiếp với CSDL,
   - Gỡ sv khỏi lớp: chỉ khi sv chưa có bài nộp (đã có bài nộp thì đình chỉ)
   - Đánh dấu đình chỉ sv (theo từng lớp, coi như xóa); bỏ đình chỉ được, lúc nào cũng được
   - Không bao giờ đổi kì học của lớp
+  - Xem (chỉ đọc) danh sách bài tập của lớp và bài nộp của từng bài (nút "Assignments…"); admin không sửa bài tập, điểm
 - Kì học
   - Thêm mới
   - Sửa được khi kì chưa kết thúc (kì đang diễn ra chỉ hiện cảnh báo "đã bắt đầu"); xóa chỉ khi kì chưa kết thúc và không còn lớp nào

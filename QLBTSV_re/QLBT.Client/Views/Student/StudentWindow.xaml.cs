@@ -249,7 +249,7 @@ public sealed partial class StudentWindow : Window
         }
         else if (a.IsClosed)
         {
-            blocked = "ℹ This assignment is closed and no longer accepts submissions.";
+            blocked = "ℹ This assignment is closed.";
         }
         else if (submission?.Score != null)
         {

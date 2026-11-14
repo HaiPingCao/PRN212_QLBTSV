@@ -130,7 +130,7 @@ public static class StudentEndpoints
         DateTime now = DateTime.Now;
         if (AssignmentRules.IsClosed(assignment, now))
         {
-            return ApiResults.Fail(ApiStatus.Rejected, "This assignment is closed and no longer accepts submissions.");
+            return ApiResults.Fail(ApiStatus.Rejected, "This assignment is closed.");
         }
 
         Submission? submission = await db.Submissions.FirstOrDefaultAsync(s => s.AssignmentId == id && s.StudentId == studentId, ct);

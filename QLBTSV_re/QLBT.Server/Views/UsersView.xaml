@@ -82,7 +82,7 @@
         <!-- List -->
         <DataGrid Grid.Row="2" x:Name="UsersGrid" SelectionChanged="Grid_SelectionChanged">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Username" Binding="{Binding Username}" Width="120" />
+                <DataGridTextColumn Header="ID" Binding="{Binding Username}" Width="120" />
                 <DataGridTextColumn Header="Full name" Binding="{Binding FullName}" Width="2*" />
                 <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="2*" />
                 <DataGridTextColumn Header="Role" Binding="{Binding Role}" Width="90" />

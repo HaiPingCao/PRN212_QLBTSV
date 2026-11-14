@@ -1,0 +1,95 @@
+<Window x:Class="QLBT.Server.Views.ClassAssignmentsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Assignments" Width="900" Height="620" MinWidth="640" MinHeight="420"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Loaded="Window_Loaded">
+    <Grid x:Name="Root" Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" x:Name="TitleText" Style="{StaticResource EditorTitle}" Margin="0,0,0,8" />
+
+        <!-- Assignments -->
+        <DataGrid Grid.Row="1" x:Name="AssignmentsGrid" SelectionChanged="AssignmentsGrid_SelectionChanged"
+                  MouseDoubleClick="OpenAssignmentFile_Click">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="2*" />
+                <DataGridTextColumn Header="Due" Binding="{Binding DueDate, StringFormat=dd/MM/yyyy HH:mm}" Width="120" />
+                <DataGridTextColumn Header="Status" Binding="{Binding StatusText}" Width="70">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="{StaticResource StatusOkBrush}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsClosed}" Value="True">
+                                    <Setter Property="Foreground" Value="{StaticResource StatusMutedBrush}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Allow late" Binding="{Binding AllowLateText}" Width="75" />
+                <DataGridTextColumn Header="File" Binding="{Binding FileName}" Width="*" />
+                <DataGridTextColumn Header="Submitted" Binding="{Binding SubmissionCount}" Width="80" />
+                <DataGridTextColumn Header="Graded" Binding="{Binding GradedCount}" Width="70" />
+            </DataGrid.Columns>
+        </DataGrid>
+        <TextBlock Grid.Row="1" x:Name="NoAssignmentsText" Text="This class has no assignments." Foreground="{StaticResource StatusMutedBrush}"
+                   HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
+
+        <DockPanel Grid.Row="2" Margin="0,6,0,0">
+            <Button x:Name="OpenAssignmentButton" DockPanel.Dock="Left" Content="Open file" Style="{StaticResource ToolbarButton}"
+                    ToolTip="Open the assignment file with its default program (or double-click)" Click="OpenAssignmentFile_Click" />
+            <Button x:Name="ShowAssignmentButton" DockPanel.Dock="Left" Content="Show in folder" Style="{StaticResource ToolbarButton}"
+                    ToolTip="Open the storage folder with the file selected" Click="ShowAssignmentFile_Click" />
+            <TextBox x:Name="AssignmentPathBox" IsReadOnly="True" VerticalContentAlignment="Center" BorderThickness="0"
+                     Background="Transparent" Foreground="{StaticResource StatusMutedBrush}" ToolTip="Storage path (select to copy)" />
+        </DockPanel>
+
+        <GridSplitter Grid.Row="3" Height="6" HorizontalAlignment="Stretch" Margin="0,6" Background="#E0E6EE"
+                      ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" ToolTip="Drag to resize" />
+
+        <TextBlock Grid.Row="4" x:Name="SubmissionsTitle" Style="{StaticResource EditorTitle}" Text="Submissions (select an assignment)"
+                   Margin="0,0,0,6" />
+
+        <!-- Submissions of the selected assignment -->
+        <DataGrid Grid.Row="5" x:Name="SubmissionsGrid" SelectionChanged="SubmissionsGrid_SelectionChanged"
+                  MouseDoubleClick="OpenSubmissionFile_Click">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Student" Binding="{Binding Username}" Width="100" />
+                <DataGridTextColumn Header="Full name" Binding="{Binding FullName}" Width="*" />
+                <DataGridTextColumn Header="Submitted" Binding="{Binding SubmittedAt, StringFormat=dd/MM/yyyy HH:mm}" Width="120" />
+                <DataGridTextColumn Header="Times" Binding="{Binding SubmitCount}" Width="55" />
+                <DataGridTextColumn Header="Late" Binding="{Binding LateText}" Width="50">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="{StaticResource StatusWarnBrush}" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Score" Binding="{Binding ScoreText}" Width="85" />
+                <DataGridTextColumn Header="Comment" Binding="{Binding Comment}" Width="*" />
+                <DataGridTextColumn Header="File" Binding="{Binding FileName}" Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <DockPanel Grid.Row="6" Margin="0,6,0,0">
+            <Button x:Name="OpenSubmissionButton" DockPanel.Dock="Left" Content="Open file" Style="{StaticResource ToolbarButton}"
+                    ToolTip="Open the submitted file with its default program (or double-click)" Click="OpenSubmissionFile_Click" />
+            <Button x:Name="ShowSubmissionButton" DockPanel.Dock="Left" Content="Show in folder" Style="{StaticResource ToolbarButton}"
+                    ToolTip="Open the storage folder with the file selected" Click="ShowSubmissionFile_Click" />
+            <TextBox x:Name="SubmissionPathBox" IsReadOnly="True" VerticalContentAlignment="Center" BorderThickness="0"
+                     Background="Transparent" Foreground="{StaticResource StatusMutedBrush}" ToolTip="Storage path (select to copy)" />
+        </DockPanel>
+
+        <Button Grid.Row="7" Content="Close" Style="{StaticResource ToolbarButton}" Margin="0,8,0,0" HorizontalAlignment="Right"
+                IsCancel="True" IsDefault="True" />
+    </Grid>
+</Window>

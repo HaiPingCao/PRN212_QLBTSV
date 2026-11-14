@@ -19,6 +19,30 @@ public sealed class ClassAdminService
     private readonly CourseDAO _courses = new CourseDAO();
     private readonly SemesterDAO _semesters = new SemesterDAO();
     private readonly UserDAO _users = new UserDAO();
+    private readonly AssignmentDAO _assignments = new AssignmentDAO();
+
+    /// <summary>Read-only view of a class's assignments (the admin does not edit them; teachers do, from the client).</summary>
+    public Task<List<AssignmentRow>> ListAssignments(int classId)
+    {
+        return _assignments.ListByClass(classId);
+    }
+
+    public Task<List<SubmissionRow>> ListSubmissions(int assignmentId)
+    {
+        return _assignments.ListSubmissions(assignmentId);
+    }
+
+    /// <summary>Full storage path of an assignment's attached file (built from ids; the file has no extension).</summary>
+    public string AssignmentFilePath(ClassRow owner, int assignmentId)
+    {
+        return DbFactory.Storage().AssignmentFile(owner.SemesterId, owner.Id, assignmentId);
+    }
+
+    /// <summary>Full storage path of a submitted file (built from ids; the file has no extension).</summary>
+    public string SubmissionFilePath(ClassRow owner, SubmissionRow submission)
+    {
+        return DbFactory.Storage().SubmissionFile(owner.SemesterId, owner.Id, submission.AssignmentId, submission.Id);
+    }
 
     /// <param name="semesterId">null = every semester.</param>
     public Task<List<ClassRow>> ListClasses(int? semesterId)

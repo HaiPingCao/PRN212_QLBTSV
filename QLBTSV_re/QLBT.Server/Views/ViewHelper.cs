@@ -1,3 +1,6 @@
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using QLBT.Server.Admin;
@@ -88,6 +91,42 @@ public static class ViewHelper
             await work();
             return "";
         }) != null;
+    }
+
+    /// <summary>
+    /// Stored files have no extension, so the file is copied to a temp folder under its original name
+    /// and opened from there with the default program. The stored file itself is never changed.
+    /// </summary>
+    public static void OpenStoredFile(DependencyObject owner, string storedPath, string fileName)
+    {
+        if (!File.Exists(storedPath))
+        {
+            Warn(owner, "The file could not be found in storage:\n" + storedPath);
+            return;
+        }
+        try
+        {
+            string folder = Path.Combine(Path.GetTempPath(), "QLBT.Server", DateTime.Now.ToString("yyyyMMdd_HHmmss_fff"));
+            Directory.CreateDirectory(folder);
+            string copy = Path.Combine(folder, Path.GetFileName(fileName));
+            File.Copy(storedPath, copy);
+            Process.Start(new ProcessStartInfo(copy) { UseShellExecute = true });
+        }
+        catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is Win32Exception)
+        {
+            Warn(owner, "The file could not be opened.\n\nDetails: " + ex.Message);
+        }
+    }
+
+    /// <summary>Opens Explorer with the stored file selected (shows its direct path).</summary>
+    public static void ShowInFolder(DependencyObject owner, string storedPath)
+    {
+        if (!File.Exists(storedPath))
+        {
+            Warn(owner, "The file could not be found in storage:\n" + storedPath);
+            return;
+        }
+        Process.Start("explorer.exe", "/select,\"" + storedPath + "\"");
     }
 
     public static DateOnly? ToDateOnly(DateTime? value)

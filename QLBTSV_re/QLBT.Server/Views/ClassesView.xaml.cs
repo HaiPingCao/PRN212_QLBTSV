@@ -68,11 +68,8 @@ public sealed partial class ClassesView : UserControl
         filterItems.AddRange(_semesters);
         _fillingFilter = true;
         SemesterFilter.ItemsSource = filterItems;
-        // Default: the running semester, else the newest one.
-        SemesterFilter.SelectedItem = filterItems.FirstOrDefault(s => s.Id == filterId)
-            ?? _semesters.FirstOrDefault(s => s.Status == SemesterStatus.Running)
-            ?? _semesters.FirstOrDefault()
-            ?? filterItems[0];
+        // Keep the current pick on refresh; "All semesters" by default.
+        SemesterFilter.SelectedItem = filterItems.FirstOrDefault(s => s.Id == filterId) ?? filterItems[0];
         _fillingFilter = false;
 
         // Keep the current picks (by id) after replacing the lists.
@@ -232,6 +229,17 @@ public sealed partial class ClassesView : UserControl
         await ReloadClasses(null);
     }
 
+    private void Assignments_Click(object sender, RoutedEventArgs e)
+    {
+        if (_editing == null)
+        {
+            return;
+        }
+        ClassAssignmentsDialog dialog = new ClassAssignmentsDialog(_editing, _service);
+        dialog.Owner = Window.GetWindow(this);
+        dialog.ShowDialog();
+    }
+
     private async void Refresh_Click(object sender, RoutedEventArgs e)
     {
         await ReloadLookups();
@@ -245,11 +253,12 @@ public sealed partial class ClassesView : UserControl
         EditorTitle.Text = "Edit class " + row.Name + " · " + row.CourseCode;
         SemesterBox.Visibility = Visibility.Collapsed;
         SemesterLockedText.Visibility = Visibility.Visible;
-        SemesterLockedText.Text = row.SemesterName + "  (cannot be changed)";
+        SemesterLockedText.Text = row.SemesterName;
         CourseBox.SelectedItem = _courses.FirstOrDefault(c => c.Id == row.CourseId);
         TeacherBox.SelectedItem = _teachers.FirstOrDefault(t => t.Id == row.TeacherId);
         NameBox.Text = row.Name;
         DeleteButton.Visibility = Visibility.Visible;
+        AssignmentsButton.Visibility = Visibility.Visible;
         ViewHelper.SetMessage(ErrorText, null);
     }
 
@@ -266,6 +275,7 @@ public sealed partial class ClassesView : UserControl
         TeacherBox.SelectedItem = null;
         NameBox.Clear();
         DeleteButton.Visibility = Visibility.Collapsed;
+        AssignmentsButton.Visibility = Visibility.Collapsed;
         ViewHelper.SetMessage(ErrorText, null);
     }
 

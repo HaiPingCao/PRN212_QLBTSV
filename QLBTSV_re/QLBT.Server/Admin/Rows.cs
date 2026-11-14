@@ -168,3 +168,73 @@ public sealed class SelectableStudent : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 }
+
+/// <summary>Row of the class assignments window (read-only).</summary>
+public sealed class AssignmentRow
+{
+    public int Id { get; init; }
+
+    public string Title { get; init; } = "";
+
+    public DateTime DueDate { get; init; }
+
+    public bool AllowLate { get; init; }
+
+    /// <summary>The teacher's "Closed" checkbox; the real state also depends on the due date.</summary>
+    public bool ClosedManually { get; init; }
+
+    public string? FileName { get; init; }
+
+    public int SubmissionCount { get; init; }
+
+    public int GradedCount { get; init; }
+
+    public bool IsClosed
+    {
+        get { return AssignmentRules.IsClosed(ClosedManually, DueDate, AllowLate, DateTime.Now); }
+    }
+
+    public string StatusText
+    {
+        get { return IsClosed ? "Closed" : "Open"; }
+    }
+
+    public string AllowLateText
+    {
+        get { return AllowLate ? "Yes" : "No"; }
+    }
+}
+
+/// <summary>Row of the submissions list in the class assignments window (read-only).</summary>
+public sealed class SubmissionRow
+{
+    public int Id { get; init; }
+
+    public int AssignmentId { get; init; }
+
+    public string Username { get; init; } = "";
+
+    public string FullName { get; init; } = "";
+
+    public DateTime SubmittedAt { get; init; }
+
+    public int SubmitCount { get; init; }
+
+    public bool IsLate { get; init; }
+
+    public decimal? Score { get; init; }
+
+    public string? Comment { get; init; }
+
+    public string FileName { get; init; } = "";
+
+    public string LateText
+    {
+        get { return IsLate ? "Late" : ""; }
+    }
+
+    public string ScoreText
+    {
+        get { return Score == null ? "Not graded" : Score.Value.ToString("0.##"); }
+    }
+}
